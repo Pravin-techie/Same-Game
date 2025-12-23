@@ -1,15 +1,13 @@
-==========================================================
 SAME GAME – ADT & DSA BASED IMPLEMENTATION
-==========================================================
 
-Project Type   : Data Structures & Algorithms Mini Project
-Language       : Python
-Game Type      : Console Based Puzzle Game
-Paradigm       : ADT + Algorithmic Design
-Author         : Pravin R
-==========================================================
-
-
+Project Type    : Data Structures & Algorithms Mini Project
+Language        : Python
+Game Type       : Console Based Puzzle Game
+Paradigm        : ADT + Algorithmic Design
+Members         : Pravin R 
+                  Vidhyadharan RP
+                  Srijith S
+                  Vijay Sathappan T
 ----------------------------------------------------------
 1. PROJECT DESCRIPTION
 ----------------------------------------------------------
