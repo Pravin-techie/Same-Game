@@ -7,7 +7,7 @@
 # 3. Stack ADT       -> DFS + Gravity
 # 4. Set ADT         -> Visited Nodes
 # 5. List ADT        -> Connected Components
-# 6. Greedy ADT      -> CPU Move Selection
+# 6. Greedy + Merge Sort -> CPU Move Selection
 # ==========================================================
 
 import random
@@ -31,12 +31,10 @@ class GridADT:
         self.board = self.create_board()
 
     def create_board(self):
-        """Create a random color grid"""
         return [[random.choice(COLORS) for _ in range(self.cols)]
                 for _ in range(self.rows)]
 
     def display(self):
-        """Display the board"""
         print("\nBoard:")
         print("   ", end="")
         for c in range(self.cols):
@@ -54,18 +52,14 @@ class GridADT:
 # GRAPH ADT (IMPLICIT GRID GRAPH)
 # ==========================================================
 class GraphADT:
-    """Provides neighbors of a grid cell"""
-
     @staticmethod
     def neighbors(r, c):
         return [(r+1, c), (r-1, c), (r, c+1), (r, c-1)]
 
 # ==========================================================
-# DFS USING STACK + BACKTRACKING
+# DFS (CONNECTED COMPONENT)
 # ==========================================================
 def dfs(grid, r, c, color, visited, component):
-    """DFS to find connected same-color blocks"""
-
     if r < 0 or r >= ROWS or c < 0 or c >= COLS:
         return
     if (r, c) in visited:
@@ -79,9 +73,6 @@ def dfs(grid, r, c, color, visited, component):
     for nr, nc in GraphADT.neighbors(r, c):
         dfs(grid, nr, nc, color, visited, component)
 
-# ==========================================================
-# CONNECTED COMPONENT
-# ==========================================================
 def get_component(grid, r, c):
     if grid.board[r][c] is None:
         return []
@@ -124,20 +115,59 @@ def is_game_over(grid):
     return True
 
 # ==========================================================
-# GREEDY CPU MOVE
+# MERGE SORT FOR CPU MOVE SELECTION
+# ==========================================================
+def merge(left, right):
+    result = []
+    i = j = 0
+
+    while i < len(left) and j < len(right):
+        if left[i][0] >= right[j][0]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+
+    while i < len(left):
+        result.append(left[i])
+        i += 1
+
+    while j < len(right):
+        result.append(right[j])
+        j += 1
+
+    return result
+
+def merge_sort_components(components):
+    if len(components) <= 1:
+        return components
+
+    mid = len(components) // 2
+    left = merge_sort_components(components[:mid])
+    right = merge_sort_components(components[mid:])
+
+    return merge(left, right)
+
+# ==========================================================
+# GREEDY CPU MOVE (MERGE SORT BASED)
 # ==========================================================
 def cpu_best_move(grid):
-    best_component = []
-    best_score = 0
+    components = []
 
     for r in range(ROWS):
         for c in range(COLS):
             if grid.board[r][c]:
                 comp = get_component(grid, r, c)
-                score = len(comp) ** 2
-                if score > best_score:
-                    best_score = score
-                    best_component = comp
+                if len(comp) > 1:
+                    score = len(comp) ** 2
+                    components.append((score, comp))
+
+    if not components:
+        return []
+
+    sorted_components = merge_sort_components(components)
+    best_score, best_component = sorted_components[0]
 
     return best_component
 
@@ -150,7 +180,7 @@ def print_instructions():
     print("2. Connected same-color blocks are removed")
     print("3. Score = (blocks removed)^2")
     print("4. Gravity applies after removal")
-    print("5. CPU uses Greedy Algorithm")
+    print("5. CPU uses Greedy + Merge Sort")
     print("6. Game ends when no moves exist")
     print("==================================\n")
 
@@ -177,7 +207,6 @@ def select_board_size():
     elif choice == '4':
         ROWS, COLS = 20, 5
     else:
-        print("Invalid choice! Defaulting to 5x5")
         ROWS, COLS = 5, 5
 
 # ==========================================================
