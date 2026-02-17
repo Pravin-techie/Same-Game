@@ -57,9 +57,9 @@ class GraphADT:
         return [(r+1, c), (r-1, c), (r, c+1), (r, c-1)]
 
 # ==========================================================
-# DFS (CONNECTED COMPONENT)
+# BFS (CONNECTED COMPONENT)
 # ==========================================================
-def dfs(grid, r, c, color, visited, component):
+def bfs(grid, r, c, color, visited, component):
     if r < 0 or r >= ROWS or c < 0 or c >= COLS:
         return
     if (r, c) in visited:
@@ -71,7 +71,7 @@ def dfs(grid, r, c, color, visited, component):
     component.append((r, c))
 
     for nr, nc in GraphADT.neighbors(r, c):
-        dfs(grid, nr, nc, color, visited, component)
+        bfs(grid, nr, nc, color, visited, component)
 
 def get_component(grid, r, c):
     if grid.board[r][c] is None:
@@ -79,7 +79,7 @@ def get_component(grid, r, c):
 
     visited = set()
     component = []
-    dfs(grid, r, c, grid.board[r][c], visited, component)
+    bfs(grid, r, c, grid.board[r][c], visited, component)
     return component
 
 # ==========================================================
@@ -304,3 +304,4 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
