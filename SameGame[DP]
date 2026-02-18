@@ -1,6 +1,6 @@
 # ==========================================================
 # SAME GAME - ADT & DSA BASED IMPLEMENTATION
-# NOW WITH DP + MERGE SORT (GREEDY REPLACED)
+# NOW WITH OPTIMAL DP + MERGE SORT
 # ==========================================================
 
 import random
@@ -50,7 +50,7 @@ class GraphADT:
         return [(r+1, c), (r-1, c), (r, c+1), (r, c-1)]
 
 # ==========================================================
-# DFS (CONNECTED COMPONENT)
+# DFS
 # ==========================================================
 def dfs(grid, r, c, color, visited, component):
     if r < 0 or r >= ROWS or c < 0 or c >= COLS:
@@ -76,14 +76,14 @@ def get_component(grid, r, c):
     return component
 
 # ==========================================================
-# REMOVE COMPONENT
+# REMOVE
 # ==========================================================
 def remove_component(grid, component):
     for r, c in component:
         grid.board[r][c] = None
 
 # ==========================================================
-# GRAVITY USING STACK
+# GRAVITY
 # ==========================================================
 def apply_gravity(grid):
     for c in range(COLS):
@@ -96,7 +96,7 @@ def apply_gravity(grid):
             grid.board[r][c] = stack.pop() if stack else None
 
 # ==========================================================
-# GAME OVER CHECK
+# GAME OVER
 # ==========================================================
 def is_game_over(grid):
     visited_global = set()
@@ -146,10 +146,8 @@ def merge_sort_components(components):
     return merge(left, right)
 
 # ==========================================================
-# DYNAMIC PROGRAMMING (REPLACES GREEDY SCORING)
+# DYNAMIC PROGRAMMING (OPTIMAL PLAY)
 # ==========================================================
-memo = {}
-
 def board_to_tuple(grid):
     return tuple(tuple(row) for row in grid.board)
 
@@ -158,7 +156,7 @@ def copy_grid(grid):
     new_grid.board = [row[:] for row in grid.board]
     return new_grid
 
-def dp_best_score(grid):
+def dp_best_score(grid, memo):
     state = board_to_tuple(grid)
 
     if state in memo:
@@ -184,16 +182,20 @@ def dp_best_score(grid):
                     remove_component(temp, comp)
                     apply_gravity(temp)
 
-                    score = len(comp) ** 2 + dp_best_score(temp)
-                    max_score = max(max_score, score)
+                    future_score = dp_best_score(temp, memo)
+                    total_score = len(comp) ** 2 + future_score
+
+                    if total_score > max_score:
+                        max_score = total_score
 
     memo[state] = max_score
     return max_score
 
 # ==========================================================
-# CPU MOVE (DP SCORE + MERGE SORT KEPT)
+# CPU MOVE
 # ==========================================================
 def cpu_best_move(grid):
+    memo = {}
     components = []
     visited_cells = set()
 
@@ -210,17 +212,20 @@ def cpu_best_move(grid):
                     remove_component(temp, comp)
                     apply_gravity(temp)
 
-                    total_score = len(comp) ** 2 + dp_best_score(temp)
+                    future_score = dp_best_score(temp, memo)
+                    total_achievable = len(comp) ** 2 + future_score
 
-                    components.append((total_score, comp))
+                    components.append((total_achievable, comp))
 
     if not components:
-        return []
+        return [], 0, 0
 
     sorted_components = merge_sort_components(components)
-    best_score, best_component = sorted_components[0]
 
-    return best_component
+    best_total, best_component = sorted_components[0]
+    immediate_score = len(best_component) ** 2
+
+    return best_component, immediate_score, best_total
 
 # ==========================================================
 # INSTRUCTIONS
@@ -231,12 +236,12 @@ def print_instructions():
     print("2. Connected same-color blocks are removed")
     print("3. Score = (blocks removed)^2")
     print("4. Gravity applies after removal")
-    print("5. CPU uses DP + Merge Sort")
+    print("5. CPU uses Optimal DP + Merge Sort")
     print("6. Game ends when no moves exist")
     print("==================================\n")
 
 # ==========================================================
-# SINGLE PLAYER
+# SINGLE PLAYER (WITH FUTURE BEST SCORE DISPLAY)
 # ==========================================================
 def single_player():
     grid = GridADT(ROWS, COLS)
@@ -245,21 +250,43 @@ def single_player():
 
     while not is_game_over(grid):
         grid.display()
-        print("Score:", score)
 
-        r = int(input("Row: "))
-        c = int(input("Column: "))
+        # Show maximum possible achievable score from this state
+        memo = {}
+        max_possible = dp_best_score(grid, memo)
+
+        print("Current Score:", score)
+        print("Maximum Achievable Score From This State:", max_possible)
+        print()
+
+        try:
+            r = int(input("Row: "))
+            c = int(input("Column: "))
+        except:
+            print("Invalid input!")
+            continue
+
+        if r < 0 or r >= ROWS or c < 0 or c >= COLS:
+            print("Out of bounds!")
+            continue
 
         comp = get_component(grid, r, c)
+
         if len(comp) <= 1:
             print("Invalid Move!")
             continue
 
-        score += len(comp) ** 2
+        gained = len(comp) ** 2
+        score += gained
+
         remove_component(grid, comp)
         apply_gravity(grid)
 
-    print("GAME OVER | Final Score:", score)
+        print("You gained:", gained)
+        print()
+
+    print("GAME OVER")
+    print("Final Score:", score)
 
 # ==========================================================
 # MULTIPLAYER
@@ -289,12 +316,15 @@ def multiplayer():
             break
 
         print("CPU thinking...")
-        cpu_comp = cpu_best_move(grid)
+        cpu_comp, immediate_score, max_future = cpu_best_move(grid)
 
-        cpu += len(cpu_comp) ** 2
+        print("Maximum Achievable Score From This State:", max_future)
+
+        cpu += immediate_score
         remove_component(grid, cpu_comp)
         apply_gravity(grid)
 
+        print("CPU gained:", immediate_score)
         print("CPU played...\n")
 
     print("GAME OVER")
@@ -304,18 +334,21 @@ def multiplayer():
 # ==========================================================
 # MAIN MENU
 # ==========================================================
+# ==========================================================
+# MAIN MENU
+# ==========================================================
 def main_menu():
     while True:
         print("\n====== SAME GAME MENU ======")
-        print("1. Single Player")
-        print("2. Multiplayer")
+        print("1. Single Player (With Optimal Future Score Display)")
+        print("2. Multiplayer (CPU Optimal)")
         print("3. Instructions")
         print("4. Exit")
 
         ch = input("Choice: ")
 
         if ch == '1':
-            single_player()
+            single_player()   # <-- calls the updated DP version
         elif ch == '2':
             multiplayer()
         elif ch == '3':
@@ -327,6 +360,6 @@ def main_menu():
             print("Invalid choice!")
 
 # ==========================================================
-# PROGRAM START
+# START
 # ==========================================================
 main_menu()
