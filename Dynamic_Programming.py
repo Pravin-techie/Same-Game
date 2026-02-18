@@ -1,3 +1,11 @@
+def board_to_tuple(grid):
+    return tuple(tuple(row) for row in grid.board)
+
+def copy_grid(grid):
+    new_grid = GridADT(ROWS, COLS)
+    new_grid.board = [row[:] for row in grid.board]
+    return new_grid
+
 def dp_best_score(grid, memo):
     # -------------------------------------------------------------------
     # Function Name:
