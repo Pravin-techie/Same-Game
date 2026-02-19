@@ -139,7 +139,7 @@ def merge(left, right):
 
     return result
 
-def merge_sort_components(components):
+""" def merge_sort_components(components):
     if len(components) <= 1:
         return components
 
@@ -147,7 +147,7 @@ def merge_sort_components(components):
     left = merge_sort_components(components[:mid])
     right = merge_sort_components(components[mid:])
 
-    return merge(left, right)
+    return merge(left, right) """ # completed part for evaluation 1
 
 # ==========================================================
 # GREEDY CPU MOVE (MERGE SORT BASED)
@@ -304,4 +304,5 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
