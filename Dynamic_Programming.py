@@ -48,7 +48,7 @@ def dp_score_difference(grid, memo, is_cpu_turn):
         return worst
 
 # FUNCTION 3: CPU MOVE - Using turn-aware adversarial DP
-#Worst case: O(S × N²)
+#Worst case: O(2^N × N²)
 
 
 def cpu_best_move(grid):
