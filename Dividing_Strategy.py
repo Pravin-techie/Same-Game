@@ -24,81 +24,90 @@ def divide_board_regions(grid):
     print("(Overlapping components included in both regions)")
     return left_region, right_region
 
-
-# -------------------------------------------------------------------
-# Function Name:
-#   divide_board_regions
+# ------------------------------------------------------------
+# divide_board_regions(grid)
 #
 # Purpose:
-#   Divides all removable connected components into two regions:
-#       • Left Region
-#       • Right Region
-#   The assignment depends on where the majority of the component’s
-#   cells lie relative to the board's vertical midpoint.
+#   Split removable components into LEFT and RIGHT regions
+#   using the board’s vertical midpoint.
 #
-# -------------------------------------------------------------------
-# Division Rule:
-#   1. Midpoint is computed using:
-#          mid = COLS // 2
+# How it works:
+#   1. mid = grid.cols // 2
+#   2. For each component:
+#        • If all cells are left of mid → Left region
+#        • If all cells are right of mid → Right region
+#        • If it crosses mid → Added to BOTH regions
 #
-#   2. For every removable component:
-#          • Count cells where column < mid  → left_count
-#          • right_count = total size - left_count
+# Important:
+#   • Overlapping components are allowed.
+#   • No component is split into parts.
+#   • Regions may share components.
 #
-#   3. Region Assignment:
-#          • If left_count >= right_count → Left Region
-#          • Else → Right Region
+# Why overlapping:
+#   To ensure boundary-crossing components are evaluated
+#   in both subproblems during Divide & Conquer.
 #
-# -------------------------------------------------------------------
-# Assumptions:
-#   • COLS is defined globally.
-#   • get_all_valid_components(grid) exists.
-#   • Components are returned as list of (row, col) tuples.
-#   • Only components of size > 1 are considered removable.
-#
-# -------------------------------------------------------------------
-# Working Process:
-#   Step 1: Calculate midpoint of the board.
-#   Step 2: Fetch all valid removable components.
-#   Step 3: For each component:
-#              - Count how many cells lie in the left half.
-#              - Determine remaining cells in right half.
-#   Step 4: Compare counts and assign region.
-#   Step 5: Return left_region and right_region lists.
-#
-# -------------------------------------------------------------------
 # Time Complexity:
 #   O(N × M)
-#   Each cell is processed once through component detection
-#   and region distribution counting.
 #
 # Space Complexity:
 #   O(N × M)
-#   Extra space used for component storage and visited tracking.
+# ------------------------------------------------------------
+
+def get_optimal_hint(grid):
+    memo = {}
+    components = get_all_components(grid)
+    
+    if not components:
+        return None, 0
+    
+    best_component = None
+    best_total = -1
+    
+    for comp in components:
+        sim = copy_grid(grid)
+        remove_component(sim, comp)
+        apply_gravity(sim)
+        
+        future = -dp_score_difference(sim, memo, True)
+        total = len(comp) ** 2 + future
+        
+        if total > best_total:
+            best_total = total
+            best_component = comp
+    
+    return best_component[0], len(best_component) ** 2
+
+
+# ------------------------------------------------------------
+# get_optimal_hint(grid)
 #
-# -------------------------------------------------------------------
-# Example:
+# Purpose:
+#   Finds the best possible move for the human player
+#   using Dynamic Programming evaluation.
 #
-#   If COLS = 6 → mid = 3
+# How it works:
+#   1. Get all removable components.
+#   2. For each component:
+#        • Simulate removal + gravity.
+#        • Use DP to evaluate future score impact.
+#        • total = immediate_score + future_advantage
+#   3. Select component with maximum total score.
 #
-#   Column Index:
-#       0   1   2   |   3   4   5
+# Returns:
+#   • A hint cell (row, col) from best component
+#   • Immediate score of that component
 #
-#   Component A:
-#       [(0,0), (0,1), (1,0), (1,1)]
-#       All columns < 3
-#       → Assigned to Left Region
+# Important:
+#   • Uses memoization to avoid recomputation.
+#   • Evaluates long-term advantage, not just greedy size.
 #
-#   Component B:
-#       [(0,4), (1,4), (2,5)]
-#       All columns ≥ 3
-#       → Assigned to Right Region
+# Time Complexity:
+#   Exponential in worst case (DP minimax),
+#   but reduced using memoization.
 #
-# -------------------------------------------------------------------
-# Edge Cases Covered:
-#   • No removable components present
-#   • Component distributed across both halves
-#   • Even or odd number of columns
-#   • Empty board
-# -------------------------------------------------------------------
+# Space Complexity:
+#   O(N × M) for memo storage and grid copies.
+# ------------------------------------------------------------
+
 
