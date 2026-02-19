@@ -296,9 +296,11 @@ def get_optimal_hint(grid):
 # ==========================================================
 
 def divide_board_regions(grid):
+
     mid = grid.cols // 2
     left_region = []
     right_region = []
+    overlap_region = []
 
     all_components = get_all_components(grid)
 
@@ -316,15 +318,15 @@ def divide_board_regions(grid):
 
         # Overlapping component (spans both sides)
         elif left_present and right_present:
-            left_region.append(comp)
-            right_region.append(comp)
+            overlap_region.append(comp)
 
     print(f"\n[DIVIDE] Board split at column {mid}")
-    print(f"Left region: {len(left_region)} components")
-    print(f"Right region: {len(right_region)} components")
-    print("(Overlapping components included in both regions)")
-    return left_region, right_region
-
+    print(f"Left region (pure left): {len(left_region)} components")
+    print(f"Right region (pure right): {len(right_region)} components")
+    print(f"Overlap region (spans both): {len(overlap_region)} components")
+    
+    return left_region, right_region, overlap_region
+    
 # ==========================================================
 # CONQUERING STRATEGY - PRAVIN R CSE24037                
 # ==========================================================
@@ -562,6 +564,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
