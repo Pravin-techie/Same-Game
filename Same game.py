@@ -279,6 +279,39 @@ def divide_board_regions(grid):
     print("(Overlapping components included in both regions)")
     return left_region, right_region
 
+# ==========================================================
+# CONQUERING STRATEGY - PRAVIN R CSE24037                
+# ==========================================================
+def conquer_region(grid, region_components, memo):
+    """
+    CONQUER PHASE:
+    Evaluate each component in a region using turn-aware DP.
+    Returns the best component from this region and its value.
+    """
+    if not region_components:
+        return [], float('-inf')
+    
+    best_component = []
+    best_value = float('-inf')
+
+    print(f"\n[CONQUER] Evaluating {len(region_components)} components in region...")
+    
+    for comp in region_components:
+        sim = copy_grid(grid)
+        remove_component(sim, comp)
+        apply_gravity(sim)
+
+        gain = len(comp) ** 2
+        future = dp_score_difference(sim, memo, False)  # After CPU move, human's turn
+        value = gain - future
+
+        if value > best_value:
+            best_value = value
+            best_component = comp
+
+    print(f"[CONQUER] Best component score difference: {best_value}")
+    return best_component, best_value
+
 # FUNCTION 3: CPU MOVE - Using turn-aware adversarial DP
 def cpu_best_move(grid):
     """
@@ -442,6 +475,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
