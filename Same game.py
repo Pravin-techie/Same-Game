@@ -93,6 +93,7 @@ def remove_component(grid, component):
 # GRAVITY USING STACK ADT
 # ==========================================================
 def apply_gravity(grid):
+    # Vertical Shift
     for c in range(COLS):
         stack = []
 
@@ -102,6 +103,20 @@ def apply_gravity(grid):
 
         for r in range(ROWS-1, -1, -1):
             grid.board[r][c] = stack.pop() if stack else None
+  # Horizontal Shift 
+    write_col = 0
+    for read_col in range(grid.cols):
+        column_has_block = any(
+            grid.board[r][read_col] is not None
+            for r in range(grid.rows)
+        )
+        
+        if column_has_block:
+            if write_col != read_col:
+                for r in range(grid.rows):
+                    grid.board[r][write_col] = grid.board[r][read_col]
+                    grid.board[r][read_col] = None
+            write_col += 1
 
 # ==========================================================
 # GAME OVER CHECK
@@ -113,6 +128,14 @@ def is_game_over(grid):
                 if len(get_component(grid, r, c)) > 1:
                     return False
     return True
+
+# ==========================================================
+# HELPER FUNCTION: DUPLICATE COPY OF THE GRID
+# ==========================================================
+def copy_grid(grid):
+    new_grid = GridADT(grid.rows, grid.cols)
+    new_grid.board = [row[:] for row in grid.board]
+    return new_grid
 
 # ==========================================================
 # MERGE SORT FOR CPU MOVE SELECTION
@@ -350,9 +373,13 @@ def print_instructions():
     print("1. Select a cell (row, column)")
     print("2. Connected same-color blocks are removed")
     print("3. Score = (blocks removed)^2")
-    print("4. Gravity applies after removal")
-    print("5. CPU uses Greedy + Merge Sort")
+    print("4. Gravity applies after removal (vertical drop + horizontal shift)")
+    print("5. CPU uses VISIBLE DIVIDE & CONQUER + Dynamic Programming")
+    print("   - DIVIDE: Split board into Left/Right regions")
+    print("   - CONQUER: Evaluate each region with turn-aware DP")
+    print("   - COMBINE: Select best region")
     print("6. Game ends when no moves exist")
+    print("7. In Multiplayer mode, you can ask for optimal hints!")
     print("==================================\n")
 
 # ==========================================================
@@ -420,12 +447,26 @@ def multiplayer():
         grid.display()
         print("Human:", human, "| CPU:", cpu)
 
-        r = int(input("Row: "))
-        c = int(input("Column: "))
+        # HUMAN HINT OPTION
+        choice = input("Do you want optimal hint? (y/n): ").lower()
+        if choice == 'y':
+            hint_cell, hint_score = get_optimal_hint(grid)
+            if hint_cell:
+                print(f"Optimal Move → Row {hint_cell[0]}, Column {hint_cell[1]}")
+                print(f"Immediate Score: {hint_score}")
+                print("Following hints every turn gives maximum possible score.\n")
+
+        # -------- HUMAN MOVE --------
+        try:
+            r = int(input("Row: "))
+            c = int(input("Column: "))
+        except ValueError:
+            print("Invalid input! Please enter numbers.")
+            continue
 
         comp = get_component(grid, r, c)
         if len(comp) <= 1:
-            print("Invalid Move!")
+            print("Invalid Move! Select a cell that is part of a group of 2 or more.")
             continue
 
         human += len(comp) ** 2
@@ -435,17 +476,21 @@ def multiplayer():
         if is_game_over(grid):
             break
 
+        # -------- CPU MOVE --------
         cpu_comp = cpu_best_move(grid)
-        cpu += len(cpu_comp) ** 2
-        remove_component(grid, cpu_comp)
-        apply_gravity(grid)
-
-        print("CPU played...\n")
+        if cpu_comp:  # Check if CPU has a valid move
+            cpu += len(cpu_comp) ** 2
+            remove_component(grid, cpu_comp)
+            apply_gravity(grid)
+            print("CPU played with D&C strategy!\n")
+        else:
+            print("CPU has no valid moves!\n")
+            break
 
     print("GAME OVER")
     print("Human:", human, "| CPU:", cpu)
     print("Winner:", "Human 🎉" if human > cpu else "CPU 🤖")
-
+    
 # ==========================================================
 # MAIN MENU
 # ==========================================================
@@ -475,6 +520,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
