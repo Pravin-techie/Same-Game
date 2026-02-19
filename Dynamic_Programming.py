@@ -1,86 +1,76 @@
-def board_to_tuple(grid):
-    return tuple(tuple(row) for row in grid.board)
+# FUNCTION 2: DP SCORE DIFFERENCE - Turn-aware optimal evaluation
+def dp_score_difference(grid, memo, is_cpu_turn):
+    """
+    Returns maximum score DIFFERENCE (current player - opponent)
+    from this board state.
+    """
 
-def copy_grid(grid):
-    new_grid = GridADT(ROWS, COLS)
-    new_grid.board = [row[:] for row in grid.board]
-    return new_grid
+    state = (tuple(tuple(row) for row in grid.board), is_cpu_turn)
 
-def dp_best_score(grid, memo):
-    # -------------------------------------------------------------------
-    # Function Name:
-    #   dp_best_score
-    #
-    # Purpose:
-    #   Recursively computes the maximum achievable score from the current
-    #   board state using a dynamic programming approach with memoization.
-    #   Each move consists of removing a connected component of size > 1,
-    #   scoring points equal to (component_size)^2, and applying gravity.
-    #
-    # -------------------------------------------------------------------
-    # Parameters:
-    #   grid : GridADT object
-    #       Current board state.
-    #   memo : dict
-    #       Stores previously computed results for board states to avoid
-    #       redundant computations.
-    #
-    # Returns:
-    #   max_score : int
-    #       Maximum score achievable from this board state onward.
-    #
-    # -------------------------------------------------------------------
-    # Working Process:
-    #   Step 1: Convert the board into an immutable tuple for memoization.
-    state = board_to_tuple(grid)
-
-    #   Step 2: Return precomputed result if the state has been evaluated.
     if state in memo:
         return memo[state]
 
-    #   Step 3: Check if the game is over (no removable components).
-    if is_game_over(grid):
-        memo[state] = 0
+    components = divide_moves(grid)
+
+    if not components:
         return 0
 
-    #   Step 4: Initialize the maximum score for this state.
-    max_score = 0
-    visited_cells = set()  # Tracks which cells have been included in a component
+    if is_cpu_turn:
+        best = float('-inf')
+        for comp in components:
+            sim = copy_grid(grid)
+            remove_component(sim, comp)
+            apply_gravity(sim)
 
-    #   Step 5: Iterate through all cells of the board
-    for r in range(ROWS):
-        for c in range(COLS):
-            #   Step 5a: If the cell is non-empty and not visited, find its component
-            if grid.board[r][c] and (r, c) not in visited_cells:
+            gain = len(comp) ** 2
+            future = dp_score_difference(sim, memo, False)
 
-                #   Step 5b: Get all connected cells of the same color/value
-                comp = get_component(grid, r, c)
+            best = max(best, gain - future)
 
-                #   Step 5c: Mark all component cells as visited
-                for cell in comp:
-                    visited_cells.add(cell)
+        memo[state] = best
+        return best
 
-                #   Step 5d: Only consider components of size > 1
-                if len(comp) > 1:
-                    #   Step 5e: Make a copy of the board to simulate this move
-                    temp = copy_grid(grid)
+    else:
+        worst = float('inf')
+        for comp in components:
+            sim = copy_grid(grid)
+            remove_component(sim, comp)
+            apply_gravity(sim)
 
-                    #   Step 5f: Remove the component and apply gravity
-                    remove_component(temp, comp)
-                    apply_gravity(temp)
+            gain = len(comp) ** 2
+            future = dp_score_difference(sim, memo, True)
 
-                    #   Step 5g: Recursively compute the future score from the new board
-                    future_score = dp_best_score(temp, memo)
+            worst = min(worst, future - gain)
 
-                    #   Step 5h: Calculate total score for this move
-                    total_score = len(comp) ** 2 + future_score
+        memo[state] = worst
+        return worst
 
-                    #   Step 5i: Update max_score if this move is better
-                    if total_score > max_score:
-                        max_score = total_score
-
-    #   Step 6: Memoize the result for the current board state
-    memo[state] = max_score
-
-    #   Step 7: Return the maximum score achievable from this state
-    return max_score
+# FUNCTION 3: CPU MOVE - Using turn-aware adversarial DP
+def cpu_best_move(grid):
+    """
+    CPU MOVE USING Divide & Conquer + DP
+    Turn-aware adversarial score difference evaluation.
+    """
+    
+    memo = {}
+    components = divide_moves(grid)
+    
+    if not components:
+        return []
+    
+    best_component = []
+    best_value = float('-inf')
+    
+    for comp in components:
+        sim = copy_grid(grid)
+        remove_component(sim, comp)
+        apply_gravity(sim)
+        
+        gain = len(comp) ** 2
+        value = gain - dp_score_difference(sim, memo, False)
+        
+        if value > best_value:
+            best_value = value
+            best_component = comp
+    
+    return best_component
