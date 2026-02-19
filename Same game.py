@@ -117,7 +117,7 @@ def is_game_over(grid):
 # ==========================================================
 # MERGE SORT FOR CPU MOVE SELECTION
 # ==========================================================
-def merge(left, right):
+""" def merge(left, right):
     result = []
     i = j = 0
 
@@ -137,7 +137,7 @@ def merge(left, right):
         result.append(right[j])
         j += 1
 
-    return result
+    return result """ # completed for part for evaluation 1
 
 """ def merge_sort_components(components):
     if len(components) <= 1:
@@ -152,7 +152,7 @@ def merge(left, right):
 # ==========================================================
 # GREEDY CPU MOVE (MERGE SORT BASED)
 # ==========================================================
-def cpu_best_move(grid):
+""" def cpu_best_move(grid):
     components = []
 
     for r in range(ROWS):
@@ -169,7 +169,7 @@ def cpu_best_move(grid):
     sorted_components = merge_sort_components(components)
     best_score, best_component = sorted_components[0]
 
-    return best_component
+    return best_component """ # completed part for evaluation 1
 
 # ==========================================================
 # INSTRUCTIONS
@@ -304,5 +304,6 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
