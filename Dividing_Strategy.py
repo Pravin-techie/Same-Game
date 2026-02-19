@@ -1,19 +1,27 @@
 def divide_board_regions(grid):
-    mid = COLS // 2
+    mid = grid.cols // 2
     left_region = []
     right_region = []
-
-    all_components = get_all_valid_components(grid)
+    all_components = get_all_components(grid)
 
     for comp in all_components:
-        left_count = sum(1 for r, c in comp if c < mid)
-        right_count = len(comp) - left_count
-
-        if left_count >= right_count:
+        left_present = any(c < mid for r, c in comp)
+        right_present = any(c >= mid for r, c in comp)
+        # Pure left component
+        if left_present and not right_present:
             left_region.append(comp)
-        else:
+        # Pure right component
+        elif right_present and not left_present:
+            right_region.append(comp)
+        # Overlapping component (spans both sides)
+        elif left_present and right_present:
+            left_region.append(comp)
             right_region.append(comp)
 
+    print(f"\n[DIVIDE] Board split at column {mid}")
+    print(f"Left region: {len(left_region)} components")
+    print(f"Right region: {len(right_region)} components")
+    print("(Overlapping components included in both regions)")
     return left_region, right_region
 
 
@@ -93,3 +101,4 @@ def divide_board_regions(grid):
 #   • Even or odd number of columns
 #   • Empty board
 # -------------------------------------------------------------------
+
