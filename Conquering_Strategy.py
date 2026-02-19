@@ -1,5 +1,5 @@
 # ==========================================================
-# 🔥 NEW FUNCTION 2: CONQUER - Evaluate a region using DP
+# CONQUER - Evaluate a region using DP
 # ==========================================================
 def conquer_region(grid, region_components, memo):
     """
@@ -32,57 +32,33 @@ def conquer_region(grid, region_components, memo):
     return best_component, best_value
 
 
-# ==========================================================
-# WORKING PRINCIPLE
-# ==========================================================
-# 1. This function represents the CONQUER phase of Divide & Conquer.
-# 2. It receives a list of components belonging to a specific region.
-# 3. For each component:
-#       a) It creates a copy of the board.
-#       b) Simulates removing that component.
-#       c) Applies gravity to update the board.
-# 4. It calculates the immediate gain = (size of component)^2.
-# 5. Then it calls dp_score_difference() to compute optimal future
-#    score difference assuming the opponent plays optimally.
-# 6. It computes:
-#           value = gain - future
-#    which represents total advantage for CPU.
-# 7. It selects the component that gives maximum score difference.
-# 8. Finally, it returns the best component and its value.
-
-
-# ==========================================================
-# TIME COMPLEXITY ANALYSIS
-# ==========================================================
-# Let:
-#   R = number of rows
-#   C = number of columns
-#   N = R * C (total cells)
-#   K = number of components in region
+# ------------------------------------------------------------
+# Purpose:
+#   Selects the best move for CPU from a given region
+#   using Dynamic Programming evaluation.
 #
-# For each component:
-#   - copy_grid()         → O(N)
-#   - remove_component()  → O(N) (worst case)
-#   - apply_gravity()     → O(N)
-#   - dp_score_difference → Exponential in worst case
-#                           but reduced using memoization
+# How it works:
+#   1. For each component in the region:
+#        • Simulate removal + apply gravity.
+#        • Calculate immediate score = (size)^2.
+#        • Use DP to evaluate future score difference.
+#        • Compute value = gain - future.
+#   2. Choose component with maximum value.
 #
-# So per component cost ≈ O(N + DP)
+# Returns:
+#   • Best component
+#   • Best score difference
 #
-# Therefore total cost:
-#   O(K * (N + DP))
+# Important:
+#   • Represents CONQUER phase of Divide & Conquer.
+#   • Uses memoization inside DP.
+#   • Considers long-term optimal play (not greedy).
 #
-# In worst case without memoization:
-#   DP is exponential → O(b^d)
-#
-# With memoization:
-#   DP reduces to number of unique board states.
-#
-# Overall practical complexity:
-#   Dominated by DP recursion and state exploration.
-#
-# So overall complexity:
-#   O(K * N + DP_states)
+# Time Complexity:
+#   O(K × (N + DP))
+#   Worst case exponential due to minimax recursion.
 #
 # Space Complexity:
-#   O(DP_states) for memoization storage.
+#   O(DP_states) for memo storage.
+# ------------------------------------------------------------
+
