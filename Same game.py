@@ -83,6 +83,27 @@ def get_component(grid, r, c):
     return component
 
 # ==========================================================
+# GET COMPONENT - WITH BOUNDARY SAFETY - S SRIJITH CSE24044
+# ==========================================================
+def get_component(grid, r, c):
+    """
+    Get connected component at position (r,c) with boundary safety.
+    """
+    # Boundary safety check
+    if r < 0 or r >= grid.rows or c < 0 or c >= grid.cols:
+        return []
+    
+    # Empty cell check
+    if grid.board[r][c] is None:
+        return []
+
+    visited = set()
+    component = []
+    bfs(grid, r, c, grid.board[r][c], visited, component)
+    return component
+
+
+# ==========================================================
 # REMOVE COMPONENT
 # ==========================================================
 def remove_component(grid, component):
@@ -337,6 +358,24 @@ def conquer_region(grid, region_components, memo):
     print(f"[CONQUER] Best component score difference: {best_value}")
     return best_component, best_value
 
+# ==========================================================
+# COMBINING DIVIDE AND CONQUER - S SRIJITH CSE24044
+# ==========================================================
+def combine_results(left_comp, left_value, right_comp, right_value):
+    """
+    COMBINE PHASE:
+    Choose the region that gives better score difference.
+    """
+    print(f"\n[COMBINE] Left region value: {left_value}")
+    print(f"[COMBINE] Right region value: {right_value}")
+    
+    if left_value >= right_value:
+        print("[COMBINE] Selecting LEFT region move")
+        return left_comp
+    else:
+        print("[COMBINE] Selecting RIGHT region move")
+        return right_comp
+
 #CSE24058 VIDHYADHARAN RP
 def cpu_best_move(grid):
     """
@@ -523,6 +562,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
