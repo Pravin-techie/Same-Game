@@ -1,58 +1,68 @@
 def divide_board_regions(grid):
+
     mid = grid.cols // 2
     left_region = []
     right_region = []
+    overlap_region = []
+
     all_components = get_all_components(grid)
 
     for comp in all_components:
         left_present = any(c < mid for r, c in comp)
         right_present = any(c >= mid for r, c in comp)
+
         # Pure left component
         if left_present and not right_present:
             left_region.append(comp)
+
         # Pure right component
         elif right_present and not left_present:
             right_region.append(comp)
+
         # Overlapping component (spans both sides)
-        elif left_present and right_present:
-            left_region.append(comp)
-            right_region.append(comp)
+        else:   # (left_present and right_present)
+            overlap_region.append(comp)
 
     print(f"\n[DIVIDE] Board split at column {mid}")
-    print(f"Left region: {len(left_region)} components")
-    print(f"Right region: {len(right_region)} components")
-    print("(Overlapping components included in both regions)")
-    return left_region, right_region
+    print(f"Left region (pure left): {len(left_region)} components")
+    print(f"Right region (pure right): {len(right_region)} components")
+    print(f"Overlap region (spans both): {len(overlap_region)} components")
+    
+    return left_region, right_region, overlap_region
+
 
 # ------------------------------------------------------------
 # divide_board_regions(grid)
 #
 # Purpose:
-#   Split removable components into LEFT and RIGHT regions
-#   using the board’s vertical midpoint.
+#   Split removable components into LEFT, RIGHT,
+#   and OVERLAP regions using the board’s vertical midpoint.
 #
 # How it works:
 #   1. mid = grid.cols // 2
 #   2. For each component:
-#        • If all cells are left of mid → Left region
+#        • If all cells are left of mid  → Left region
 #        • If all cells are right of mid → Right region
-#        • If it crosses mid → Added to BOTH regions
+#        • If it crosses mid             → Overlap region
 #
 # Important:
-#   • Overlapping components are allowed.
 #   • No component is split into parts.
-#   • Regions may share components.
+#   • Overlapping components are stored separately.
+#   • Regions do NOT duplicate components.
 #
-# Why overlapping:
-#   To ensure boundary-crossing components are evaluated
-#   in both subproblems during Divide & Conquer.
+# Why overlap region:
+#   To handle components that span across both subproblems
+#   in Divide & Conquer without breaking connectivity.
 #
 # Time Complexity:
-#   O(N × M)
+#   O(K)
+#   where K = total number of cells across all components.
 #
 # Space Complexity:
-#   O(N × M)
+#   O(C)
+#   where C = number of components stored.
 # ------------------------------------------------------------
+
 
 def get_optimal_hint(grid):
     memo = {}
@@ -109,5 +119,6 @@ def get_optimal_hint(grid):
 # Space Complexity:
 #   O(N × M) for memo storage and grid copies.
 # ------------------------------------------------------------
+
 
 
