@@ -361,22 +361,32 @@ def conquer_region(grid, region_components, memo):
     return best_component, best_value
 
 # ==========================================================
-# COMBINING DIVIDE AND CONQUER - S SRIJITH CSE24044
+# COMBINING RESULTS - S SRIJITH CSE24044
 # ==========================================================
-def combine_results(left_comp, left_value, right_comp, right_value):
+def combine_results(left_result, right_result, overlap_result):
     """
     COMBINE PHASE:
-    Choose the region that gives better score difference.
+    Select best component from all three regions
     """
-    print(f"\n[COMBINE] Left region value: {left_value}")
-    print(f"[COMBINE] Right region value: {right_value}")
+    candidates = [left_result, right_result, overlap_result]
     
-    if left_value >= right_value:
-        print("[COMBINE] Selecting LEFT region move")
-        return left_comp
-    else:
-        print("[COMBINE] Selecting RIGHT region move")
-        return right_comp
+    best_component = []
+    best_value = float('-inf')
+
+    print(f"\n[COMBINE] Left: {left_result[1]} | Right: {right_result[1]} | Overlap: {overlap_result[1]}")
+    
+    for comp, value in candidates:
+        if value > best_value:
+            best_value = value
+            best_component = comp
+
+    region_names = ["LEFT", "RIGHT", "OVERLAP"]
+    for i, (comp, value) in enumerate(candidates):
+        if comp == best_component and value == best_value:
+            print(f"[COMBINE] Selecting {region_names[i]} region (value: {value})")
+            break
+    
+    return best_component right_comp
 
 #CSE24058 VIDHYADHARAN RP
 def cpu_best_move(grid):
@@ -564,6 +574,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
