@@ -48,34 +48,35 @@ def dp_score_difference(grid, memo, is_cpu_turn):
         return worst
 
 # FUNCTION 3: CPU MOVE - Using turn-aware adversarial DP
-#Worst case: O(N² + S × N²)
+#Worst case: O(S × N²)
 
 
 def cpu_best_move(grid):
     """
-    CPU MOVE USING Divide & Conquer + DP
-    Turn-aware adversarial score difference evaluation.
+    CPU MOVE USING VISIBLE DIVIDE & CONQUER + DP
+    - DIVIDE: Split board into Left/Right regions
+    - CONQUER: Evaluate each region using turn-aware DP
+    - COMBINE: Select best region
     """
     
+    print("\n" + "="*50)
+    print("CPU TURN - DIVIDE & CONQUER + DP")
+    print("="*50)
+    
     memo = {}
-    components = divide_moves(grid)
     
-    if not components:
-        return []
+    # -------- DIVIDE PHASE --------
+    print("\n🔹 PHASE 1: DIVIDE")
+    left_region, right_region = divide_board_regions(grid)
     
-    best_component = []
-    best_value = float('-inf')
+    # -------- CONQUER PHASE --------
+    print("\n🔹 PHASE 2: CONQUER")
+    left_comp, left_value = conquer_region(grid, left_region, memo)
+    right_comp, right_value = conquer_region(grid, right_region, memo)
     
-    for comp in components:
-        sim = copy_grid(grid)
-        remove_component(sim, comp)
-        apply_gravity(sim)
-        
-        gain = len(comp) ** 2
-        value = gain - dp_score_difference(sim, memo, False)
-        
-        if value > best_value:
-            best_value = value
-            best_component = comp
+    # -------- COMBINE PHASE --------
+    print("\n🔹 PHASE 3: COMBINE")
+    best_component = combine_results(left_comp, left_value, right_comp, right_value)
     
+    print("="*50)
     return best_component
