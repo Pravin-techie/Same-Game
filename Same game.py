@@ -352,25 +352,24 @@ def conquer_region(grid, region_components, memo):
     return best_component, best_value
 
 # ==========================================================
-# COMBINING RESULTS - S SRIJITH CSE24044
+# COMBINING PHASE - S SRIJITH CSE24044
 # ==========================================================
 def combine_results(results):
     """
     COMBINE PHASE:
-    Select best move among all independent regions.
+    Select best move among all region results.
     """
+
     best_component = None
     best_value = float('-inf')
-    best_region_idx = -1
 
-    for i, (comp, value) in enumerate(results):
-        if value > best_value:
+    for comp, value in results:
+        if comp is not None and value > best_value:
             best_value = value
             best_component = comp
-            best_region_idx = i
 
-    print(f"[COMBINE] Selected region {best_region_idx} with value: {best_value}")
     return best_component
+
 
 #CSE24058 VIDHYADHARAN RP
 def cpu_best_move(grid):
@@ -566,6 +565,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
