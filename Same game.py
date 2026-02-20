@@ -363,30 +363,23 @@ def conquer_region(grid, region_components, memo):
 # ==========================================================
 # COMBINING RESULTS - S SRIJITH CSE24044
 # ==========================================================
-def combine_results(left_result, right_result, overlap_result):
+def combine_results(results):
     """
     COMBINE PHASE:
-    Select best component from all three regions
+    Select best move among all independent regions.
     """
-    candidates = [left_result, right_result, overlap_result]
-    
-    best_component = []
+    best_component = None
     best_value = float('-inf')
+    best_region_idx = -1
 
-    print(f"\n[COMBINE] Left: {left_result[1]} | Right: {right_result[1]} | Overlap: {overlap_result[1]}")
-    
-    for comp, value in candidates:
+    for i, (comp, value) in enumerate(results):
         if value > best_value:
             best_value = value
             best_component = comp
+            best_region_idx = i
 
-    region_names = ["LEFT", "RIGHT", "OVERLAP"]
-    for i, (comp, value) in enumerate(candidates):
-        if comp == best_component and value == best_value:
-            print(f"[COMBINE] Selecting {region_names[i]} region (value: {value})")
-            break
-    
-    return best_component right_comp
+    print(f"[COMBINE] Selected region {best_region_idx} with value: {best_value}")
+    return best_component
 
 #CSE24058 VIDHYADHARAN RP
 def cpu_best_move(grid):
@@ -574,6 +567,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
