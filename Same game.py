@@ -296,8 +296,8 @@ def get_optimal_hint(grid):
 # ==========================================================
 
 def divide_board_regions(grid):
-    
-    independent_regions = []
+
+    regions = []
     current_region = []
 
     for c in range(grid.cols):
@@ -310,14 +310,13 @@ def divide_board_regions(grid):
             current_region.append(c)
         else:
             if current_region:
-                independent_regions.append(current_region)
+                regions.append(current_region)
                 current_region = []
 
     if current_region:
-        independent_regions.append(current_region)
+        regions.append(current_region)
 
-    print(f"\n[DIVIDE] Independent column regions: {independent_regions}")
-    return independent_regions
+    return regions
     
 # ==========================================================
 # CONQUERING STRATEGY - PRAVIN R CSE24037                
@@ -567,6 +566,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
