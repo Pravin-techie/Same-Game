@@ -321,34 +321,40 @@ def divide_board_regions(grid):
 # ==========================================================
 # CONQUERING STRATEGY - PRAVIN R CSE24037                
 # ==========================================================
-def conquer_region(grid, region_components, memo):
+def conquer_region(grid, region_cols, memo):
     """
     CONQUER PHASE:
-    Evaluate each component in a region using turn-aware DP.
-    Returns the best component from this region and its value.
+    Evaluate best move inside one independent region.
+    Uses turn-aware DP.
     """
-    if not region_components:
-        return [], float('-inf')
-    
-    best_component = []
+
+    best_component = None
     best_value = float('-inf')
 
-    print(f"\n[CONQUER] Evaluating {len(region_components)} components in region...")
-    
+    components = get_all_components(grid)
+
+    # Only consider components fully inside the region columns
+    region_components = [
+        comp for comp in components
+        if all(c in region_cols for r, c in comp)
+    ]
+
     for comp in region_components:
         sim = copy_grid(grid)
         remove_component(sim, comp)
         apply_gravity(sim)
 
         gain = len(comp) ** 2
-        future = dp_score_difference(sim, memo, False)  # After CPU move, human's turn
+
+        # Opponent turn next
+        future = dp_score_difference(sim, memo, False)
+
         value = gain - future
 
         if value > best_value:
             best_value = value
             best_component = comp
 
-    print(f"[CONQUER] Best component score difference: {best_value}")
     return best_component, best_value
 
 # ==========================================================
@@ -565,6 +571,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
