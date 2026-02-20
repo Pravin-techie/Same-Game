@@ -36,24 +36,22 @@ def get_component(grid, r, c):
 # ----------------------------------------------------------
 
 # ==========================================================
-# COMBINE
+# COMBINING PHASE
 # ==========================================================
 def combine_results(results):
     """
     COMBINE PHASE:
-    Select best move among all independent regions.
+    Select best move among all region results.
     """
+
     best_component = None
     best_value = float('-inf')
-    best_region_idx = -1
 
-    for i, (comp, value) in enumerate(results):
-        if value > best_value:
+    for comp, value in results:
+        if comp is not None and value > best_value:
             best_value = value
             best_component = comp
-            best_region_idx = i
 
-    print(f"[COMBINE] Selected region {best_region_idx} with value: {best_value}")
     return best_component
 
 
@@ -68,24 +66,27 @@ def combine_results(results):
 #     component -> list of cells representing a possible move
 #     value     -> evaluated score (or score difference)
 #
-# The function:
-#   1. Initializes variables to track the best component.
-#   2. Iterates through all region results.
-#   3. Compares their values.
-#   4. Selects the component with the highest value.
-#   5. Prints which region index was selected.
-#   6. Returns the best component.
+# The function works as follows:
+# 1. Initialize best_value as negative infinity to ensure
+#    that any real score will replace it.
+# 2. Iterate through each (component, value) pair in results.
+# 3. Ignore invalid components (comp is None).
+# 4. Compare the value with the current best_value.
+# 5. If a higher value is found, update best_value and
+#    store the corresponding component.
+# 6. After checking all region results, return the
+#    component with the highest value.
 #
-# This effectively merges the solutions of multiple
-# independent regions and chooses the optimal one.
+# This effectively merges the evaluated results from
+# multiple regions and selects the optimal move.
 #
 # Time Complexity:
-# O(k)
-# Where k = number of independent regions (length of results).
-# The loop runs once over all region results.
+# O(k), where k = number of region results.
+# The function performs a single pass through the list.
 #
 # Space Complexity:
-# O(1)
-# Only a few variables are used regardless of input size.
+# O(1), since only a few tracking variables are used
+# regardless of the size of the input list.
 # ----------------------------------------------------------
+
 
