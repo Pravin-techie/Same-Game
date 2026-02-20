@@ -36,65 +36,56 @@ def get_component(grid, r, c):
 # ----------------------------------------------------------
 
 # ==========================================================
-# COMBINING RESULT
+# COMBINE
 # ==========================================================
-
-def combine_results(left_result, right_result, overlap_result):
+def combine_results(results):
     """
     COMBINE PHASE:
-    Select best component from all three regions
+    Select best move among all independent regions.
     """
-    candidates = [left_result, right_result, overlap_result]
-    
-    best_component = []
+    best_component = None
     best_value = float('-inf')
+    best_region_idx = -1
 
-    print(f"\n[COMBINE] Left: {left_result[1]} | Right: {right_result[1]} | Overlap: {overlap_result[1]}")
-    
-    for comp, value in candidates:
+    for i, (comp, value) in enumerate(results):
         if value > best_value:
             best_value = value
             best_component = comp
+            best_region_idx = i
 
-    region_names = ["LEFT", "RIGHT", "OVERLAP"]
-    for i, (comp, value) in enumerate(candidates):
-        if comp == best_component and value == best_value:
-            print(f"[COMBINE] Selecting {region_names[i]} region (value: {value})")
-            break
-    
+    print(f"[COMBINE] Selected region {best_region_idx} with value: {best_value}")
     return best_component
 
 
 # ----------------------------------------------------------
 # Explanation:
-# This function represents the COMBINE phase of an extended
-# Divide & Conquer approach where three subregions exist:
-#   1. Left region
-#   2. Right region
-#   3. Overlap region
+# This function represents the COMBINE phase of the
+# Divide & Conquer strategy.
 #
-# Each region result is expected in the form:
-#   (component, value)
+# The input 'results' is a list where each element is:
+#     (component, value)
 # where:
-#   component -> list of cells
-#   value     -> evaluated score of that component
+#     component -> list of cells representing a possible move
+#     value     -> evaluated score (or score difference)
 #
 # The function:
-#   1. Stores all three region results into a list.
-#   2. Iterates through them to find the maximum value.
-#   3. Selects the component corresponding to that maximum value.
-#   4. Prints which region was selected.
+#   1. Initializes variables to track the best component.
+#   2. Iterates through all region results.
+#   3. Compares their values.
+#   4. Selects the component with the highest value.
+#   5. Prints which region index was selected.
+#   6. Returns the best component.
 #
-# This merges (combines) the solutions of three subproblems
-# into one final optimal decision.
+# This effectively merges the solutions of multiple
+# independent regions and chooses the optimal one.
 #
 # Time Complexity:
-# O(1)
-# Since the number of regions is fixed (3), the loop runs
-# a constant number of times. Therefore, execution time
-# does not depend on board size.
+# O(k)
+# Where k = number of independent regions (length of results).
+# The loop runs once over all region results.
 #
 # Space Complexity:
 # O(1)
-# Only a small fixed-size list (3 elements) is created.
+# Only a few variables are used regardless of input size.
 # ----------------------------------------------------------
+
