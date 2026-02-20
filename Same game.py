@@ -296,36 +296,28 @@ def get_optimal_hint(grid):
 # ==========================================================
 
 def divide_board_regions(grid):
-
-    mid = grid.cols // 2
-    left_region = []
-    right_region = []
-    overlap_region = []
-
-    all_components = get_all_components(grid)
-
-    for comp in all_components:
-        left_present = any(c < mid for r, c in comp)
-        right_present = any(c >= mid for r, c in comp)
-
-        # Pure left component
-        if left_present and not right_present:
-            left_region.append(comp)
-
-        # Pure right component
-        elif right_present and not left_present:
-            right_region.append(comp)
-
-        # Overlapping component (spans both sides)
-        elif left_present and right_present:
-            overlap_region.append(comp)
-
-    print(f"\n[DIVIDE] Board split at column {mid}")
-    print(f"Left region (pure left): {len(left_region)} components")
-    print(f"Right region (pure right): {len(right_region)} components")
-    print(f"Overlap region (spans both): {len(overlap_region)} components")
     
-    return left_region, right_region, overlap_region
+    independent_regions = []
+    current_region = []
+
+    for c in range(grid.cols):
+        column_has_block = any(
+            grid.board[r][c] is not None
+            for r in range(grid.rows)
+        )
+
+        if column_has_block:
+            current_region.append(c)
+        else:
+            if current_region:
+                independent_regions.append(current_region)
+                current_region = []
+
+    if current_region:
+        independent_regions.append(current_region)
+
+    print(f"\n[DIVIDE] Independent column regions: {independent_regions}")
+    return independent_regions
     
 # ==========================================================
 # CONQUERING STRATEGY - PRAVIN R CSE24037                
@@ -567,6 +559,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
