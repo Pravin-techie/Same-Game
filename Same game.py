@@ -376,30 +376,38 @@ def combine_results(results):
 #CSE24058 VIDHYADHARAN RP
 def cpu_best_move(grid):
     """
-    CPU MOVE USING VISIBLE DIVIDE & CONQUER + DP
-    - DIVIDE: Split board into Left/Right regions
-    - CONQUER: Evaluate each region using turn-aware DP
-    - COMBINE: Select best region
+    CPU MOVE USING TRUE DIVIDE & CONQUER + DP
+    - DIVIDE: Split into independent column regions (separated by empty columns)
+    - CONQUER: Evaluate each region independently with turn-aware DP
+    - COMBINE: Select best overall move from all regions
     """
-    
     print("\n" + "="*50)
-    print("CPU TURN - DIVIDE & CONQUER + DP")
+    print("CPU TURN - TRUE DIVIDE & CONQUER + DP")
     print("="*50)
     
     memo = {}
     
-    # -------- DIVIDE PHASE --------
+    # -------- PHASE 1: DIVIDE --------
     print("\n🔹 PHASE 1: DIVIDE")
-    left_region, right_region = divide_board_regions(grid)
+    regions = divide_board_regions(grid)
     
-    # -------- CONQUER PHASE --------
+    # -------- PHASE 2: CONQUER --------
     print("\n🔹 PHASE 2: CONQUER")
-    left_comp, left_value = conquer_region(grid, left_region, memo)
-    right_comp, right_value = conquer_region(grid, right_region, memo)
+    results = []
     
-    # -------- COMBINE PHASE --------
+    for i, region_cols in enumerate(regions):
+        print(f"\n--- Region {i} (cols {region_cols}) ---")
+        comp, value = conquer_region(grid, region_cols, memo)
+        results.append((comp, value))
+    
+    # -------- PHASE 3: COMBINE --------
     print("\n🔹 PHASE 3: COMBINE")
-    best_component = combine_results(left_comp, left_value, right_comp, right_value)
+    best_component = combine_results(results)
+    
+    if best_component:
+        print(f"[RESULT] Selected component of size {len(best_component)} at {best_component[0]}")
+    else:
+        print("[RESULT] No valid moves found")
     
     print("="*50)
     return best_component
@@ -559,6 +567,7 @@ def main_menu():
 # PROGRAM START
 # ==========================================================
 main_menu()
+
 
 
 
