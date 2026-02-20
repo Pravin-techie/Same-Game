@@ -127,7 +127,7 @@ class ComponentFinder:
         return components
 
 # ==========================================================
-# PERFECT CPU STRATEGY
+# PERFECT CPU STRATEGY - FIXED VERSION
 # ==========================================================
 class PerfectCPU:
     def __init__(self, difficulty="hard"):
@@ -356,76 +356,103 @@ class PerfectCPU:
     
     def get_best_move(self, grid):
         """
-        MAIN ALGORITHM:
-        1. Divide board into independent regions
-        2. Solve each region optimally
-        3. Combine results for best move
+        MAIN ALGORITHM - FIXED VERSION
+        Prioritizes larger components while still considering strategy
         """
         start_time = time.time()
         self.nodes_evaluated = 0
         self.memo.clear()
         
-        # DIVIDE PHASE
-        regions = self.divide_into_regions(grid)
+        # Get all components
+        all_components = ComponentFinder.get_all_components(grid)
         
-        if not regions:
+        if not all_components:
             return None
         
-        # If board is small enough, search entire board
+        # Sort components by size (largest first) for initial consideration
+        all_components.sort(key=len, reverse=True)
+        
+        # If board is small, use full minimax
         total_cells = grid.rows * grid.cols
         if total_cells <= 36:  # 6x6 or smaller
             depth = min(self.max_depth, 8)
             _, best_move = self.minimax(grid, depth, float('-inf'), float('inf'), True, start_time)
             return best_move
         
-        # CONQUER PHASE - Solve each region independently
-        region_moves = []
+        # DIVIDE PHASE - Get regions
+        regions = self.divide_into_regions(grid)
         
+        # CONQUER PHASE - Evaluate top moves from each region
+        candidate_moves = []
+        
+        # Consider top components by size (at least top 5 or all if less)
+        top_components = all_components[:min(5, len(all_components))]
+        
+        for comp in top_components:
+            # Calculate immediate gain
+            immediate_gain = len(comp) ** 2
+            
+            # Quick future evaluation with limited depth
+            new_grid = self.apply_move(grid, comp)
+            future_components = ComponentFinder.get_all_components(new_grid)
+            
+            if future_components:
+                # Look at best possible future move
+                best_future = max(len(fc) for fc in future_components)
+                future_potential = best_future ** 2 * 0.5  # Weight future less than immediate
+            else:
+                future_potential = 1000  # Winning move bonus
+            
+            # Also consider if this move creates good opportunities
+            # Check if it creates a larger component after gravity
+            strategic_bonus = 0
+            for fc in future_components[:min(3, len(future_components))]:
+                if len(fc) >= len(comp):  # Future component is as large or larger
+                    strategic_bonus += len(fc) ** 2 * 0.3
+            
+            # Total score with heavy weight on immediate gain
+            total_score = (immediate_gain * 2.0) + future_potential + strategic_bonus
+            
+            candidate_moves.append((comp, total_score))
+        
+        # Also check region-based moves for completeness
         for region_cols in regions:
-            # Time check
-            if time.time() - start_time > self.time_limit * 0.8:
-                break
+            region_components = [comp for comp in all_components 
+                               if all(c in region_cols for _, c in comp)]
             
-            # Create region subproblem
-            region_moves_in_region = []
-            all_components = ComponentFinder.get_all_components(grid)
-            
-            # Filter components in this region
-            for comp in all_components:
-                if all(c in region_cols for _, c in comp):
-                    region_moves_in_region.append(comp)
-            
-            if not region_moves_in_region:
-                continue
-            
-            # Evaluate each move in this region with limited depth
-            best_region_move = None
-            best_region_score = float('-inf')
-            
-            for comp in region_moves_in_region:
-                # Apply move
-                new_grid = self.apply_move(grid, comp)
+            if region_components:
+                # Take the largest component from this region
+                best_in_region = max(region_components, key=len)
                 
-                # Limited depth search for future
-                future_score, _ = self.minimax(new_grid, min(3, self.max_depth - 2), 
-                                               float('-inf'), float('inf'), False, start_time)
-                
-                total_score = (len(comp) ** 2) + future_score
-                
-                if total_score > best_region_score:
-                    best_region_score = total_score
-                    best_region_move = comp
-            
-            if best_region_move:
-                region_moves.append((best_region_move, best_region_score))
+                # Check if we already have it
+                if not any(best_in_region == cm[0] for cm in candidate_moves):
+                    immediate_gain = len(best_in_region) ** 2
+                    new_grid = self.apply_move(grid, best_in_region)
+                    future_components = ComponentFinder.get_all_components(new_grid)
+                    
+                    if future_components:
+                        best_future = max(len(fc) for fc in future_components)
+                        future_potential = best_future ** 2 * 0.5
+                    else:
+                        future_potential = 1000
+                    
+                    total_score = (immediate_gain * 2.0) + future_potential
+                    candidate_moves.append((best_in_region, total_score))
         
-        # COMBINE PHASE - Select best move across regions
-        if not region_moves:
-            # Fallback to greedy
-            return self._greedy_move(grid)
+        # Sort by total score and pick the best
+        if candidate_moves:
+            candidate_moves.sort(key=lambda x: x[1], reverse=True)
+            best_move = candidate_moves[0][0]
+            
+            # Debug info (can be removed)
+            print(f"Selected move: {len(best_move)} blocks, score: {candidate_moves[0][1]:.2f}")
+            if len(candidate_moves) > 1:
+                print(f"Runner up: {len(candidate_moves[1][0])} blocks, score: {candidate_moves[1][1]:.2f}")
+            
+            return best_move
         
-        best_move = max(region_moves, key=lambda x: x[1])[0]
-        return best_move
+        # Ultimate fallback - just take the largest component
+        return max(all_components, key=len)
     
     def _greedy_move(self, grid):
         """Greedy fallback (largest component)"""
@@ -958,7 +985,7 @@ class SameGameGUI:
             tk.Label(cpu_frame, text=f"{difficulty_emoji} CPU", 
                     font=('Arial', 12), fg='#94a3b8', bg='#1e293b').pack()
             tk.Label(cpu_frame, text=str(self.cpu_score),
-                    font=('Arial', 20, 'bold'), fg='#3b82f6', bg='#1e293b').pack()
+                    font=('Arial', 20, 'bold'), fg='#ef4444', bg='#1e293b').pack()
         else:
             tk.Label(self.score_frame, text=f"🏆 {self.score}",
                     font=('Arial', 24, 'bold'), fg='#fbbf24', bg='#1e293b').pack()
