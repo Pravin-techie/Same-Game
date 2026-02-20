@@ -1,68 +1,57 @@
 def divide_board_regions(grid):
-
-    mid = grid.cols // 2
-    left_region = []
-    right_region = []
-    overlap_region = []
-
-    all_components = get_all_components(grid)
-
-    for comp in all_components:
-        left_present = any(c < mid for r, c in comp)
-        right_present = any(c >= mid for r, c in comp)
-
-        # Pure left component
-        if left_present and not right_present:
-            left_region.append(comp)
-
-        # Pure right component
-        elif right_present and not left_present:
-            right_region.append(comp)
-
-        # Overlapping component (spans both sides)
-        else:   # (left_present and right_present)
-            overlap_region.append(comp)
-
-    print(f"\n[DIVIDE] Board split at column {mid}")
-    print(f"Left region (pure left): {len(left_region)} components")
-    print(f"Right region (pure right): {len(right_region)} components")
-    print(f"Overlap region (spans both): {len(overlap_region)} components")
     
-    return left_region, right_region, overlap_region
+    independent_regions = []
+    current_region = []
 
+    for c in range(grid.cols):
+        column_has_block = any(
+            grid.board[r][c] is not None
+            for r in range(grid.rows)
+        )
+
+        if column_has_block:
+            current_region.append(c)
+        else:
+            if current_region:
+                independent_regions.append(current_region)
+                current_region = []
+
+    if current_region:
+        independent_regions.append(current_region)
+
+    print(f"\n[DIVIDE] Independent column regions: {independent_regions}")
+    return independent_regions
 
 # ------------------------------------------------------------
 # divide_board_regions(grid)
 #
 # Purpose:
-#   Split removable components into LEFT, RIGHT,
-#   and OVERLAP regions using the board’s vertical midpoint.
+#   Split the board into independent column regions
+#   separated by completely empty columns.
 #
 # How it works:
-#   1. mid = grid.cols // 2
-#   2. For each component:
-#        • If all cells are left of mid  → Left region
-#        • If all cells are right of mid → Right region
-#        • If it crosses mid             → Overlap region
+#   1. Traverse columns from left to right.
+#   2. If a column has at least one block → add to current region.
+#   3. If a column is empty → close the current region.
+#   4. Continue until all columns are processed.
 #
 # Important:
-#   • No component is split into parts.
-#   • Overlapping components are stored separately.
-#   • Regions do NOT duplicate components.
+#   • Regions contain contiguous non-empty columns.
+#   • No column belongs to more than one region.
+#   • Regions represent independent subproblems.
 #
-# Why overlap region:
-#   To handle components that span across both subproblems
-#   in Divide & Conquer without breaking connectivity.
+# Why separation by empty column:
+#   An empty column guarantees that blocks on the left
+#   cannot interact with blocks on the right.
 #
 # Time Complexity:
-#   O(K)
-#   where K = total number of cells across all components.
+#   O(R × C)
+#   where R = rows, C = columns.
 #
 # Space Complexity:
 #   O(C)
-#   where C = number of components stored.
+#   to store column indices of regions.
 # ------------------------------------------------------------
-
 
 def get_optimal_hint(grid):
     memo = {}
@@ -87,7 +76,6 @@ def get_optimal_hint(grid):
             best_component = comp
     
     return best_component[0], len(best_component) ** 2
-
 
 # ------------------------------------------------------------
 # get_optimal_hint(grid)
@@ -119,6 +107,7 @@ def get_optimal_hint(grid):
 # Space Complexity:
 #   O(N × M) for memo storage and grid copies.
 # ------------------------------------------------------------
+
 
 
 
