@@ -1,6 +1,6 @@
 def divide_board_regions(grid):
-    
-    independent_regions = []
+
+    regions = []
     current_region = []
 
     for c in range(grid.cols):
@@ -13,44 +13,47 @@ def divide_board_regions(grid):
             current_region.append(c)
         else:
             if current_region:
-                independent_regions.append(current_region)
+                regions.append(current_region)
                 current_region = []
 
     if current_region:
-        independent_regions.append(current_region)
+        regions.append(current_region)
 
-    print(f"\n[DIVIDE] Independent column regions: {independent_regions}")
-    return independent_regions
+    return regions
 
 # ------------------------------------------------------------
 # divide_board_regions(grid)
 #
 # Purpose:
-#   Split the board into independent column regions
-#   separated by completely empty columns.
+#   Divide the board into independent column regions
+#   separated by fully empty columns.
 #
 # How it works:
-#   1. Traverse columns from left to right.
-#   2. If a column has at least one block → add to current region.
-#   3. If a column is empty → close the current region.
-#   4. Continue until all columns are processed.
+#   1. Iterate through columns from left to right.
+#   2. For each column, check if it contains at least one block.
+#   3. If non-empty → add column index to current_region.
+#   4. If empty → close the current region (if not empty)
+#      and start a new region.
+#   5. After finishing all columns, append the last region
+#      if it exists.
 #
-# Important:
-#   • Regions contain contiguous non-empty columns.
-#   • No column belongs to more than one region.
-#   • Regions represent independent subproblems.
+# Output:
+#   A list of lists.
+#   Each inner list contains indices of contiguous
+#   non-empty columns forming one independent region.
 #
-# Why separation by empty column:
-#   An empty column guarantees that blocks on the left
-#   cannot interact with blocks on the right.
+# Key Property:
+#   Columns separated by an empty column are independent,
+#   meaning blocks on one side cannot interact with blocks
+#   on the other side due to gravity and compression rules.
 #
 # Time Complexity:
 #   O(R × C)
-#   where R = rows, C = columns.
+#   (each column scans all rows once)
 #
 # Space Complexity:
 #   O(C)
-#   to store column indices of regions.
+#   (stores column indices of regions)
 # ------------------------------------------------------------
 
 def get_optimal_hint(grid):
@@ -107,6 +110,7 @@ def get_optimal_hint(grid):
 # Space Complexity:
 #   O(N × M) for memo storage and grid copies.
 # ------------------------------------------------------------
+
 
 
 
