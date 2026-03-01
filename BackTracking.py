@@ -65,37 +65,41 @@ def backtracking_best_score(grid, is_cpu_turn):
 
 def cpu_best_move_backtracking(grid):
     """
-    CPU move using pure Backtracking (no DP).
-    Explores entire game tree.
+    CPU move using pure Backtracking (Minimax style).
+    Explores entire game tree without DP.
     """
 
     components = get_all_components(grid)
-
     best_value = float('-inf')
     best_component = None
 
     for comp in components:
+
+        # Skip useless moves
         if len(comp) <= 1:
             continue
 
-        # Save current board
-        original_board = copy_grid(grid)
+        # Deep copy the board safely
+        original_state = copy_grid(grid)
 
         # Make move
         remove_component(grid, comp)
         apply_gravity(grid)
 
         gain = len(comp) ** 2
-        future = backtracking_best_score(grid, False)
 
-        value = gain - future
+        # Opponent turn
+        opponent_best = backtracking_best_score(grid, is_cpu=False)
 
-        if value > best_value:
-            best_value = value
+        current_value = gain - opponent_best
+
+        # Choose maximum value move
+        if current_value > best_value:
+            best_value = current_value
             best_component = comp
 
-        # Backtrack
-        grid.board = original_board.board
+        # Restore board (safe backtracking)
+        grid.board = [row[:] for row in original_state.board]
 
     return best_component
 
