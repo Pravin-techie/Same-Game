@@ -1,3 +1,6 @@
+# ==========================================================
+# BACKTRACKING CPU / OPTIMAL HINT
+# ==========================================================
 def backtracking_best_score(grid, is_cpu_turn):
     """
     Pure Backtracking (no memoization)
@@ -15,6 +18,9 @@ def backtracking_best_score(grid, is_cpu_turn):
         best = float('-inf')
 
         for comp in components:
+            if len(comp) <= 1:
+                continue
+
             # --- Save current state (for backtracking) ---
             original_board = copy_grid(grid)
 
@@ -36,6 +42,9 @@ def backtracking_best_score(grid, is_cpu_turn):
         worst = float('inf')
 
         for comp in components:
+            if len(comp) <= 1:
+                continue
+
             # --- Save current state ---
             original_board = copy_grid(grid)
 
@@ -54,7 +63,6 @@ def backtracking_best_score(grid, is_cpu_turn):
         return worst
 
 
-
 def cpu_best_move_backtracking(grid):
     """
     CPU move using pure Backtracking (no DP).
@@ -67,8 +75,13 @@ def cpu_best_move_backtracking(grid):
     best_component = None
 
     for comp in components:
+        if len(comp) <= 1:
+            continue
+
+        # Save current board
         original_board = copy_grid(grid)
 
+        # Make move
         remove_component(grid, comp)
         apply_gravity(grid)
 
@@ -85,3 +98,13 @@ def cpu_best_move_backtracking(grid):
         grid.board = original_board.board
 
     return best_component
+
+
+def get_optimal_hint_backtracking(grid):
+    """
+    Provides optimal hint for human using backtracking CPU.
+    """
+    best_comp = cpu_best_move_backtracking(grid)
+    if best_comp:
+        return best_comp[0], len(best_comp) ** 2
+    return None, 0
