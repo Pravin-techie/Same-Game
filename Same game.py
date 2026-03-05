@@ -180,11 +180,42 @@ def copy_grid(grid):
     return new_grid
 
 # ==========================================================
-# ============== STRATEGY 1: GREEDY ALGORITHM =============
+# STRATEGY 1: GREEDY (Optimized with visited set)
+# CSE24044 - S SRIJITH
 # ==========================================================
-# PASTE GREEDY FUNCTIONS HERE:
-# 1. greedy_best_move(grid)
-# ==========================================================
+def greedy_best_move(grid):
+    """
+    Greedy Strategy:
+    - Find all components using visited set
+    - Sort by score (size^2) in descending order
+    - Pick the largest component
+    """
+    visited = set()
+    components = []
+
+    for r in range(grid.rows):
+        for c in range(grid.cols):
+            if (r, c) in visited:
+                continue
+            if grid.board[r][c] is None:
+                continue
+
+            comp = []
+            dfs(grid, r, c, grid.board[r][c], visited, comp)
+
+            if len(comp) > 1:
+                score = len(comp) ** 2
+                components.append((score, comp))
+
+    if not components:
+        return None
+
+    components.sort(reverse=True, key=lambda x: x[0])
+    
+    best_score, best_component = components[0]
+    print(f"Greedy selected: size {len(best_component)} with score {best_score}")
+    
+    return best_component
 
 
 
@@ -312,6 +343,27 @@ def conquer_region(grid, region_cols, memo):
             best_component = comp
 
     return best_component, best_value
+
+# ==========================================================
+# COMBINE RESULTS
+# CSE24044 S SRIJITH
+# ==========================================================
+def combine_results(results):
+    """
+    COMBINING PHASE - S SRIJITH CSE24044
+    Select best move among all region results
+    """
+    best_component = None
+    best_value = float('-inf')
+
+    for comp, value in results:
+        if comp is not None and value > best_value:
+            best_value = value
+            best_component = comp
+
+    return best_component
+
+
 
 # ==========================================================
 # ========== STRATEGY 3: BACKTRACKING + MEMOIZATION =======
@@ -670,6 +722,7 @@ def main_menu():
 # ==========================================================
 if __name__ == "__main__":
     main_menu()
+
 
 
 
