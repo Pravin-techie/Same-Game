@@ -373,7 +373,52 @@ def combine_results(results):
 # 2. backtracking_best_move(grid)
 # ==========================================================
 
+# ==========================================================
+# BACKTRACKING BEST MOVE
+# CSE24059 - [Vijay Sathappan & Srijith]
+# ==========================================================
+def backtracking_best_move(grid):
+    """
+    Backtracking Strategy:
+    - Try all possible moves recursively
+    - Use memoization to cache results
+    - Return move that leads to maximum total score
+    """
+    global backtrack_cache
+    backtrack_cache = {}
 
+    components = get_all_components(grid)
+    
+    if not components:
+        return None
+
+    best_component = None
+    best_total = -1
+
+    print("\n" + "="*50)
+    print("BACKTRACKING + MEMOIZATION")
+    print("="*50)
+    
+    for comp in components:
+        sim = copy_grid(grid)
+        remove_component(sim, comp)
+        apply_gravity(sim)
+
+        gain = len(comp) ** 2
+        future = backtracking_score(sim)
+        total = gain + future
+
+        print(f"Component at {comp[0]}: immediate={gain}, future={future:.2f}, total={total:.2f}")
+
+        if total > best_total:
+            best_total = total
+            best_component = comp
+
+    if best_component:
+        print(f"[RESULT] Selected component of size {len(best_component)} at {best_component[0]}")
+    
+    print("="*50)
+    return best_component
 
 # ==========================================================
 # HINT STRATEGY - VIJAY SATHAPPAN CSE24059 - FIXED
@@ -722,6 +767,7 @@ def main_menu():
 # ==========================================================
 if __name__ == "__main__":
     main_menu()
+
 
 
 
