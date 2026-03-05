@@ -363,6 +363,52 @@ def combine_results(results):
 
     return best_component
 
+# ==========================================================
+# CPU BEST MOVE DC+DP
+# CSE24058 VIDHYADHARAN RP
+# ==========================================================
+def cpu_best_move_dc_dp(grid):
+    """
+    CPU MOVE USING TRUE DIVIDE & CONQUER + DP
+    CSE24058 VIDHYADHARAN RP
+    """
+    print("\n" + "="*50)
+    print("CPU TURN - TRUE DIVIDE & CONQUER + DP")
+    print("="*50)
+    
+    memo = {}
+    
+    # -------- PHASE 1: DIVIDE --------
+    print("\n🔹 PHASE 1: DIVIDE")
+    regions = divide_board_regions(grid)
+    
+    if not regions:
+        print("[RESULT] No regions found")
+        print("="*50)
+        return None
+    
+    # -------- PHASE 2: CONQUER --------
+    print("\n🔹 PHASE 2: CONQUER")
+    results = []
+    
+    for i, region_cols in enumerate(regions):
+        print(f"\n--- Region {i} (cols {region_cols}) ---")
+        comp, value = conquer_region(grid, region_cols, memo)
+        results.append((comp, value))
+        if comp:
+            print(f"Best in region: size {len(comp)} at {comp[0]}, value={value:.2f}")
+    
+    # -------- PHASE 3: COMBINE --------
+    print("\n🔹 PHASE 3: COMBINE")
+    best_component = combine_results(results)
+    
+    if best_component:
+        print(f"[RESULT] Selected component of size {len(best_component)} at {best_component[0]}")
+    else:
+        print("[RESULT] No valid moves found")
+    
+    print("="*50)
+    return best_component
 
 
 # ==========================================================
@@ -803,6 +849,7 @@ def main_menu():
 # ==========================================================
 if __name__ == "__main__":
     main_menu()
+
 
 
 
