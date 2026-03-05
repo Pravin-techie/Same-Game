@@ -199,6 +199,55 @@ def copy_grid(grid):
 # 5. cpu_best_move_dc_dp(grid)
 # ==========================================================
 
+# ==========================================================
+# DP SCORE DIFFERENCE - Turn-aware optimal evaluation
+# CSE24058 VIDHYADHARAN RP
+# ==========================================================
+
+def dp_score_difference(grid, memo, is_cpu_turn):
+    """
+    Returns maximum score DIFFERENCE (current player - opponent)
+    from this board state.
+    """
+    state = (tuple(tuple(row) for row in grid.board), is_cpu_turn)
+
+    if state in memo:
+        return memo[state]
+
+    components = get_all_components(grid)
+
+    if not components:
+        return 0
+
+    if is_cpu_turn:
+        best = float('-inf')
+        for comp in components:
+            sim = copy_grid(grid)
+            remove_component(sim, comp)
+            apply_gravity(sim)
+
+            gain = len(comp) ** 2
+            future = dp_score_difference(sim, memo, False)
+
+            best = max(best, gain - future)
+
+        memo[state] = best
+        return best
+
+    else:
+        worst = float('inf')
+        for comp in components:
+            sim = copy_grid(grid)
+            remove_component(sim, comp)
+            apply_gravity(sim)
+
+            gain = len(comp) ** 2
+            future = dp_score_difference(sim, memo, True)
+
+            worst = min(worst, future - gain)
+
+        memo[state] = worst
+        return worst
 
 
 # ==========================================================
@@ -558,3 +607,4 @@ def main_menu():
 # ==========================================================
 if __name__ == "__main__":
     main_menu()
+
