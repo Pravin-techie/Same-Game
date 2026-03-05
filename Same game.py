@@ -203,7 +203,6 @@ def copy_grid(grid):
 # DP SCORE DIFFERENCE - Turn-aware optimal evaluation
 # CSE24058 VIDHYADHARAN RP
 # ==========================================================
-
 def dp_score_difference(grid, memo, is_cpu_turn):
     """
     Returns maximum score DIFFERENCE (current player - opponent)
@@ -248,6 +247,36 @@ def dp_score_difference(grid, memo, is_cpu_turn):
 
         memo[state] = worst
         return worst
+
+# ==========================================================
+# DIVIDE BOARD REGIONS
+# CSE24059 VIJAY SATHAPPAN
+# ==========================================================
+def divide_board_regions(grid):
+    """
+    DIVIDING STRATEGY - VIJAY CSE24059
+    Split board into independent column regions
+    """
+    regions = []
+    current_region = []
+
+    for c in range(grid.cols):
+        column_has_block = any(
+            grid.board[r][c] is not None
+            for r in range(grid.rows)
+        )
+
+        if column_has_block:
+            current_region.append(c)
+        else:
+            if current_region:
+                regions.append(current_region)
+                current_region = []
+
+    if current_region:
+        regions.append(current_region)
+
+    return regions
 
 
 # ==========================================================
@@ -607,4 +636,5 @@ def main_menu():
 # ==========================================================
 if __name__ == "__main__":
     main_menu()
+
 
