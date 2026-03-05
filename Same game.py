@@ -7,10 +7,14 @@
 # 3. Stack ADT       -> DFS + Gravity
 # 4. Set ADT         -> Visited Nodes
 # 5. List ADT        -> Connected Components
-# 6. Greedy + Merge Sort -> CPU Move Selection
+# 6. Multiple Strategies:
+#    - Greedy (Merge Sort based)
+#    - Divide & Conquer + Dynamic Programming
+#    - Backtracking + Memoization
 # ==========================================================
 
 import random
+import time
 
 # -------------------------------
 # GLOBAL GAME VARIABLES
@@ -18,6 +22,7 @@ import random
 ROWS = 6
 COLS = 6
 COLORS = ['R', 'G', 'B', 'Y']
+STRATEGY_MODE = "dc_dp"  # Default strategy
 
 # ==========================================================
 # GRID ADT
@@ -44,7 +49,7 @@ class GridADT:
         for r in range(self.rows):
             print(r, " ", end="")
             for c in range(self.cols):
-                print(self.board[r][c] if self.board[r][c] else '.', end=" ")
+                print(self.board[r][c] if self.board[r][c] is not None else '.', end=" ")
             print()
         print()
 
@@ -57,10 +62,11 @@ class GraphADT:
         return [(r+1, c), (r-1, c), (r, c+1), (r, c-1)]
 
 # ==========================================================
-# BFS (CONNECTED COMPONENT)
+# DFS (CONNECTED COMPONENT) - Renamed from BFS
 # ==========================================================
-def bfs(grid, r, c, color, visited, component):
-    if r < 0 or r >= ROWS or c < 0 or c >= COLS:
+def dfs(grid, r, c, color, visited, component):
+    """DFS to find connected component"""
+    if r < 0 or r >= grid.rows or c < 0 or c >= grid.cols:
         return
     if (r, c) in visited:
         return
@@ -71,16 +77,7 @@ def bfs(grid, r, c, color, visited, component):
     component.append((r, c))
 
     for nr, nc in GraphADT.neighbors(r, c):
-        bfs(grid, nr, nc, color, visited, component)
-
-def get_component(grid, r, c):
-    if grid.board[r][c] is None:
-        return []
-
-    visited = set()
-    component = []
-    bfs(grid, r, c, grid.board[r][c], visited, component)
-    return component
+        dfs(grid, nr, nc, color, visited, component)
 
 # ==========================================================
 # GET COMPONENT - WITH BOUNDARY SAFETY - S SRIJITH CSE24044
@@ -99,9 +96,33 @@ def get_component(grid, r, c):
 
     visited = set()
     component = []
-    bfs(grid, r, c, grid.board[r][c], visited, component)
+    dfs(grid, r, c, grid.board[r][c], visited, component)
     return component
 
+# ==========================================================
+# GET ALL COMPONENTS - Added missing function
+# ==========================================================
+def get_all_components(grid):
+    """
+    Returns list of all connected components (size > 1) on the board
+    """
+    visited = set()
+    components = []
+
+    for r in range(grid.rows):
+        for c in range(grid.cols):
+            if (r, c) in visited:
+                continue
+            if grid.board[r][c] is None:
+                continue
+
+            comp = []
+            dfs(grid, r, c, grid.board[r][c], visited, comp)
+
+            if len(comp) > 1:  # Only keep removable components
+                components.append(comp)
+
+    return components
 
 # ==========================================================
 # REMOVE COMPONENT
@@ -111,20 +132,21 @@ def remove_component(grid, component):
         grid.board[r][c] = None
 
 # ==========================================================
-# GRAVITY USING STACK ADT
+# GRAVITY USING STACK ADT - Fixed with grid.rows/grid.cols
 # ==========================================================
 def apply_gravity(grid):
     # Vertical Shift
-    for c in range(COLS):
+    for c in range(grid.cols):
         stack = []
 
-        for r in range(ROWS):
-            if grid.board[r][c]:
+        for r in range(grid.rows):
+            if grid.board[r][c] is not None:
                 stack.append(grid.board[r][c])
 
-        for r in range(ROWS-1, -1, -1):
+        for r in range(grid.rows-1, -1, -1):
             grid.board[r][c] = stack.pop() if stack else None
-  # Horizontal Shift 
+
+    # Horizontal Shift 
     write_col = 0
     for read_col in range(grid.cols):
         column_has_block = any(
@@ -140,133 +162,58 @@ def apply_gravity(grid):
             write_col += 1
 
 # ==========================================================
-# GAME OVER CHECK
+# GAME OVER CHECK - Fixed with get_all_components
 # ==========================================================
 def is_game_over(grid):
-    for r in range(ROWS):
-        for c in range(COLS):
-            if grid.board[r][c]:
-                if len(get_component(grid, r, c)) > 1:
-                    return False
-    return True
+    components = get_all_components(grid)
+    return len(components) == 0
 
 # ==========================================================
-# HELPER FUNCTION: DUPLICATE COPY OF THE GRID
+# HELPER FUNCTION: DUPLICATE COPY OF THE GRID - Fixed
 # ==========================================================
 def copy_grid(grid):
-    new_grid = GridADT(grid.rows, grid.cols)
+    """Create a deep copy of the grid"""
+    new_grid = GridADT.__new__(GridADT)
+    new_grid.rows = grid.rows
+    new_grid.cols = grid.cols
     new_grid.board = [row[:] for row in grid.board]
     return new_grid
 
 # ==========================================================
-# MERGE SORT FOR CPU MOVE SELECTION
+# ============== STRATEGY 1: GREEDY ALGORITHM =============
 # ==========================================================
-""" def merge(left, right):
-    result = []
-    i = j = 0
-
-    while i < len(left) and j < len(right):
-        if left[i][0] >= right[j][0]:
-            result.append(left[i])
-            i += 1
-        else:
-            result.append(right[j])
-            j += 1
-
-    while i < len(left):
-        result.append(left[i])
-        i += 1
-
-    while j < len(right):
-        result.append(right[j])
-        j += 1
-
-    return result """ # completed for part for evaluation 1
-
-""" def merge_sort_components(components):
-    if len(components) <= 1:
-        return components
-
-    mid = len(components) // 2
-    left = merge_sort_components(components[:mid])
-    right = merge_sort_components(components[mid:])
-
-    return merge(left, right) """ # completed part for evaluation 1
-
-# ==========================================================
-# GREEDY CPU MOVE (MERGE SORT BASED)
-# ==========================================================
-""" def cpu_best_move(grid):
-    components = []
-
-    for r in range(ROWS):
-        for c in range(COLS):
-            if grid.board[r][c]:
-                comp = get_component(grid, r, c)
-                if len(comp) > 1:
-                    score = len(comp) ** 2
-                    components.append((score, comp))
-
-    if not components:
-        return []
-
-    sorted_components = merge_sort_components(components)
-    best_score, best_component = sorted_components[0]
-
-    return best_component """ # completed part for evaluation 1
-
-#CSE24058 VIDHYADHARAN RP
-#  FUNCTION 2: DP SCORE DIFFERENCE - Turn-aware optimal evaluation
-def dp_score_difference(grid, memo, is_cpu_turn):
-    """
-    Returns maximum score DIFFERENCE (current player - opponent)
-    from this board state.
-    """
-
-    state = (tuple(tuple(row) for row in grid.board), is_cpu_turn)
-
-    if state in memo:
-        return memo[state]
-
-    components = divide_moves(grid)
-
-    if not components:
-        return 0
-
-    if is_cpu_turn:
-        best = float('-inf')
-        for comp in components:
-            sim = copy_grid(grid)
-            remove_component(sim, comp)
-            apply_gravity(sim)
-
-            gain = len(comp) ** 2
-            future = dp_score_difference(sim, memo, False)
-
-            best = max(best, gain - future)
-
-        memo[state] = best
-        return best
-
-    else:
-        worst = float('inf')
-        for comp in components:
-            sim = copy_grid(grid)
-            remove_component(sim, comp)
-            apply_gravity(sim)
-
-            gain = len(comp) ** 2
-            future = dp_score_difference(sim, memo, True)
-
-            worst = min(worst, future - gain)
-
-        memo[state] = worst
-        return worst
-
-# ==========================================================
-# HINT STRATERGY - VIJAY SATHAPPAN CSE24059
+# PASTE GREEDY FUNCTIONS HERE:
+# 1. greedy_best_move(grid)
 # ==========================================================
 
+
+
+# ==========================================================
+# ====== STRATEGY 2: DIVIDE & CONQUER + DP ALGORITHM ======
+# ==========================================================
+# PASTE DC+DP FUNCTIONS HERE:
+# 1. dp_score_difference(grid, memo, is_cpu_turn)
+# 2. divide_board_regions(grid)
+# 3. conquer_region(grid, region_cols, memo)
+# 4. combine_results(results)
+# 5. cpu_best_move_dc_dp(grid)
+# ==========================================================
+
+
+
+# ==========================================================
+# ========== STRATEGY 3: BACKTRACKING + MEMOIZATION =======
+# ==========================================================
+# PASTE BACKTRACKING FUNCTIONS HERE:
+# 1. backtracking_score(grid)
+# 2. backtracking_best_move(grid)
+# ==========================================================
+
+
+
+# ==========================================================
+# HINT STRATEGY - VIJAY SATHAPPAN CSE24059 - FIXED
+# ==========================================================
 def get_optimal_hint(grid):
     memo = {}
     components = get_all_components(grid)
@@ -282,139 +229,69 @@ def get_optimal_hint(grid):
         remove_component(sim, comp)
         apply_gravity(sim)
         
-        future = -dp_score_difference(sim, memo, True)
+        # FIXED: After human move, CPU plays next (is_cpu_turn=False)
+        future = -dp_score_difference(sim, memo, False)
         total = len(comp) ** 2 + future
         
         if total > best_total:
             best_total = total
             best_component = comp
     
+    if best_component is None:
+        return None, 0
+    
     return best_component[0], len(best_component) ** 2
 
 # ==========================================================
-# DIVIDING STRATERGY - VIJAY CSE24059
+# CPU MOVE CONTROLLER
 # ==========================================================
-
-def divide_board_regions(grid):
-
-    regions = []
-    current_region = []
-
-    for c in range(grid.cols):
-        column_has_block = any(
-            grid.board[r][c] is not None
-            for r in range(grid.rows)
-        )
-
-        if column_has_block:
-            current_region.append(c)
-        else:
-            if current_region:
-                regions.append(current_region)
-                current_region = []
-
-    if current_region:
-        regions.append(current_region)
-
-    return regions
-    
-# ==========================================================
-# CONQUERING STRATEGY - PRAVIN R CSE24037                
-# ==========================================================
-def conquer_region(grid, region_cols, memo):
-    """
-    CONQUER PHASE:
-    Evaluate best move inside one independent region.
-    Uses turn-aware DP.
-    """
-
-    best_component = None
-    best_value = float('-inf')
-
-    components = get_all_components(grid)
-
-    # Only consider components fully inside the region columns
-    region_components = [
-        comp for comp in components
-        if all(c in region_cols for r, c in comp)
-    ]
-
-    for comp in region_components:
-        sim = copy_grid(grid)
-        remove_component(sim, comp)
-        apply_gravity(sim)
-
-        gain = len(comp) ** 2
-
-        # Opponent turn next
-        future = dp_score_difference(sim, memo, False)
-
-        value = gain - future
-
-        if value > best_value:
-            best_value = value
-            best_component = comp
-
-    return best_component, best_value
-
-# ==========================================================
-# COMBINING PHASE - S SRIJITH CSE24044
-# ==========================================================
-def combine_results(results):
-    """
-    COMBINE PHASE:
-    Select best move among all region results.
-    """
-
-    best_component = None
-    best_value = float('-inf')
-
-    for comp, value in results:
-        if comp is not None and value > best_value:
-            best_value = value
-            best_component = comp
-
-    return best_component
-
-
-#CSE24058 VIDHYADHARAN RP
 def cpu_best_move(grid):
-    """
-    CPU MOVE USING TRUE DIVIDE & CONQUER + DP
-    - DIVIDE: Split into independent column regions (separated by empty columns)
-    - CONQUER: Evaluate each region independently with turn-aware DP
-    - COMBINE: Select best overall move from all regions
-    """
-    print("\n" + "="*50)
-    print("CPU TURN - TRUE DIVIDE & CONQUER + DP")
-    print("="*50)
+    """Controller that selects the appropriate strategy"""
     
-    memo = {}
-    
-    # -------- PHASE 1: DIVIDE --------
-    print("\n🔹 PHASE 1: DIVIDE")
-    regions = divide_board_regions(grid)
-    
-    # -------- PHASE 2: CONQUER --------
-    print("\n🔹 PHASE 2: CONQUER")
-    results = []
-    
-    for i, region_cols in enumerate(regions):
-        print(f"\n--- Region {i} (cols {region_cols}) ---")
-        comp, value = conquer_region(grid, region_cols, memo)
-        results.append((comp, value))
-    
-    # -------- PHASE 3: COMBINE --------
-    print("\n🔹 PHASE 3: COMBINE")
-    best_component = combine_results(results)
-    
-    if best_component:
-        print(f"[RESULT] Selected component of size {len(best_component)} at {best_component[0]}")
+    if STRATEGY_MODE == "greedy":
+        print("\n🤖 CPU Strategy: GREEDY")
+        return greedy_best_move(grid)
+
+    elif STRATEGY_MODE == "dc_dp":
+        print("\n🤖 CPU Strategy: DIVIDE & CONQUER + DP")
+        return cpu_best_move_dc_dp(grid)
+
+    elif STRATEGY_MODE == "backtracking":
+        print("\n🤖 CPU Strategy: BACKTRACKING + MEMOIZATION")
+        return backtracking_best_move(grid)
+
     else:
-        print("[RESULT] No valid moves found")
-    
+        print("\n🤖 CPU Strategy: Default (DC+DP)")
+        return cpu_best_move_dc_dp(grid)
+
+# ==========================================================
+# SELECT STRATEGY
+# ==========================================================
+def select_strategy():
+    global STRATEGY_MODE
+
+    print("\n" + "="*50)
+    print("SELECT CPU STRATEGY")
     print("="*50)
-    return best_component
+    print("1. Greedy Strategy")
+    print("2. Divide & Conquer + Dynamic Programming")
+    print("3. Backtracking + Memoization")
+    print("="*50)
+
+    choice = input("Choice (1-3): ")
+
+    if choice == '1':
+        STRATEGY_MODE = "greedy"
+        print("✅ Greedy Strategy selected")
+    elif choice == '2':
+        STRATEGY_MODE = "dc_dp"
+        print("✅ Divide & Conquer + DP selected")
+    elif choice == '3':
+        STRATEGY_MODE = "backtracking"
+        print("✅ Backtracking + Memoization selected")
+    else:
+        print("❌ Invalid choice. Using Divide & Conquer + DP.")
+        STRATEGY_MODE = "dc_dp"
 
 # ==========================================================
 # INSTRUCTIONS
@@ -425,10 +302,10 @@ def print_instructions():
     print("2. Connected same-color blocks are removed")
     print("3. Score = (blocks removed)^2")
     print("4. Gravity applies after removal (vertical drop + horizontal shift)")
-    print("5. CPU uses VISIBLE DIVIDE & CONQUER + Dynamic Programming")
-    print("   - DIVIDE: Split board into Left/Right regions")
-    print("   - CONQUER: Evaluate each region with turn-aware DP")
-    print("   - COMBINE: Select best region")
+    print("5. CPU Strategy Selection:")
+    print("   - Greedy: Largest component only")
+    print("   - Divide & Conquer + DP: Optimal with region splitting")
+    print("   - Backtracking + Memoization: Exhaustive search")
     print("6. Game ends when no moves exist")
     print("7. In Multiplayer mode, you can ask for optimal hints!")
     print("==================================\n")
@@ -459,7 +336,7 @@ def select_board_size():
         ROWS, COLS = 5, 5
 
 # ==========================================================
-# SINGLE PLAYER MODE
+# SINGLE PLAYER MODE - With input validation
 # ==========================================================
 def single_player():
     select_board_size()
@@ -471,25 +348,36 @@ def single_player():
         grid.display()
         print("Score:", score)
 
-        r = int(input("Row: "))
-        c = int(input("Column: "))
+        try:
+            r = int(input("Row: "))
+            c = int(input("Column: "))
+        except ValueError:
+            print("Invalid input! Please enter numbers.")
+            continue
+
+        if r < 0 or r >= grid.rows or c < 0 or c >= grid.cols:
+            print("Invalid coordinates! Out of bounds.")
+            continue
 
         comp = get_component(grid, r, c)
         if len(comp) <= 1:
-            print("Invalid Move!")
+            print("Invalid Move! Select a cell that is part of a group of 2 or more.")
             continue
 
         score += len(comp) ** 2
         remove_component(grid, comp)
         apply_gravity(grid)
 
-    print("GAME OVER | Final Score:", score)
+    print("\n" + "="*50)
+    print(f"GAME OVER | Final Score: {score}")
+    print("="*50)
 
 # ==========================================================
-# MULTIPLAYER MODE
+# MULTIPLAYER MODE - With strategy selection
 # ==========================================================
 def multiplayer():
     select_board_size()
+    select_strategy()
     grid = GridADT(ROWS, COLS)
     human = cpu = 0
     print_instructions()
@@ -501,18 +389,27 @@ def multiplayer():
         # HUMAN HINT OPTION
         choice = input("Do you want optimal hint? (y/n): ").lower()
         if choice == 'y':
+            start_time = time.time()
             hint_cell, hint_score = get_optimal_hint(grid)
-            if hint_cell:
-                print(f"Optimal Move → Row {hint_cell[0]}, Column {hint_cell[1]}")
-                print(f"Immediate Score: {hint_score}")
-                print("Following hints every turn gives maximum possible score.\n")
+            end_time = time.time()
+            
+            if hint_cell is not None:
+                print(f"\n💡 Optimal Move → Row {hint_cell[0]}, Column {hint_cell[1]}")
+                print(f"💡 Immediate Score: {hint_score}")
+                print(f"💡 Calculation time: {end_time - start_time:.2f}s\n")
+            else:
+                print("No hints available - game might be ending soon!\n")
 
         # -------- HUMAN MOVE --------
         try:
-            r = int(input("Row: "))
-            c = int(input("Column: "))
+            r = int(input("\nYour move - Row: "))
+            c = int(input("Your move - Column: "))
         except ValueError:
             print("Invalid input! Please enter numbers.")
+            continue
+
+        if r < 0 or r >= grid.rows or c < 0 or c >= grid.cols:
+            print("Invalid coordinates! Out of bounds.")
             continue
 
         comp = get_component(grid, r, c)
@@ -528,20 +425,106 @@ def multiplayer():
             break
 
         # -------- CPU MOVE --------
+        print("\n🤖 CPU thinking...")
+        start_time = time.time()
         cpu_comp = cpu_best_move(grid)
-        if cpu_comp:  # Check if CPU has a valid move
+        end_time = time.time()
+        
+        if cpu_comp is not None:
             cpu += len(cpu_comp) ** 2
             remove_component(grid, cpu_comp)
             apply_gravity(grid)
-            print("CPU played with D&C strategy!\n")
+            print(f"✅ CPU played! (+{len(cpu_comp)**2} points)")
+            print(f"⏱️  Thinking time: {end_time - start_time:.2f}s\n")
         else:
             print("CPU has no valid moves!\n")
             break
 
+    print("\n" + "="*50)
     print("GAME OVER")
+    print("="*50)
     print("Human:", human, "| CPU:", cpu)
-    print("Winner:", "Human 🎉" if human > cpu else "CPU 🤖")
+    print("-"*20)
+    if human > cpu:
+        print("Winner: Human 🎉")
+    elif cpu > human:
+        print("Winner: CPU 🤖")
+    else:
+        print("It's a tie! 🤝")
+    print("="*50)
+
+# ==========================================================
+# BENCHMARK MODE - With random seed fix
+# ==========================================================
+def benchmark_strategies():
+    """Compare all three strategies on the same board"""
+    print("\n" + "="*50)
+    print("📊 BENCHMARK: Comparing All Strategies")
+    print("="*50)
     
+    # Save current random state
+    current_seed = random.getstate()
+    
+    # Use fixed seed for reproducibility
+    random.seed(42)
+    grid = GridADT(6, 6)
+    
+    print("\nInitial Board:")
+    grid.display()
+    
+    strategies = [
+        ("Greedy", greedy_best_move),
+        ("DC+DP", cpu_best_move_dc_dp),
+        ("Backtracking", backtracking_best_move)
+    ]
+    
+    results = []
+    
+    for name, strategy in strategies:
+        print(f"\n{'-'*40}")
+        print(f"Testing {name} Strategy...")
+        
+        # Copy the original grid
+        test_grid = copy_grid(grid)
+        score = 0
+        moves = 0
+        
+        start_time = time.time()
+        
+        # Play until game over
+        while not is_game_over(test_grid):
+            move = strategy(test_grid)
+            if move is None:
+                break
+            score += len(move) ** 2
+            remove_component(test_grid, move)
+            apply_gravity(test_grid)
+            moves += 1
+        
+        end_time = time.time()
+        
+        results.append({
+            'name': name,
+            'score': score,
+            'moves': moves,
+            'time': end_time - start_time
+        })
+    
+    # Restore random state
+    random.setstate(current_seed)
+    
+    # Print comparison table
+    print("\n" + "="*50)
+    print("📊 BENCHMARK RESULTS")
+    print("="*50)
+    print(f"{'Strategy':<15} {'Score':<10} {'Moves':<10} {'Time (s)':<10}")
+    print("-"*45)
+    
+    for r in results:
+        print(f"{r['name']:<15} {r['score']:<10} {r['moves']:<10} {r['time']:<10.2f}")
+    
+    print("="*50)
+
 # ==========================================================
 # MAIN MENU
 # ==========================================================
@@ -551,7 +534,8 @@ def main_menu():
         print("1. Single Player")
         print("2. Multiplayer")
         print("3. Instructions")
-        print("4. Exit")
+        print("4. Benchmark Strategies")
+        print("5. Exit")
 
         ch = input("Choice: ")
 
@@ -562,6 +546,8 @@ def main_menu():
         elif ch == '3':
             print_instructions()
         elif ch == '4':
+            benchmark_strategies()
+        elif ch == '5':
             print("Thanks for playing!")
             break
         else:
@@ -570,21 +556,5 @@ def main_menu():
 # ==========================================================
 # PROGRAM START
 # ==========================================================
-main_menu()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    main_menu()
