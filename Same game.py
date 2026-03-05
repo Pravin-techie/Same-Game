@@ -278,6 +278,40 @@ def divide_board_regions(grid):
 
     return regions
 
+# ==========================================================
+# CONQUER REGION
+# CSE24037 PRAVIN R
+# ==========================================================
+def conquer_region(grid, region_cols, memo):
+    """
+    CONQUERING STRATEGY - PRAVIN R CSE24037
+    Evaluate best move inside one independent region
+    """
+    best_component = None
+    best_value = float('-inf')
+
+    components = get_all_components(grid)
+
+    # Only consider components fully inside the region columns
+    region_components = [
+        comp for comp in components
+        if all(c in region_cols for r, c in comp)
+    ]
+
+    for comp in region_components:
+        sim = copy_grid(grid)
+        remove_component(sim, comp)
+        apply_gravity(sim)
+
+        gain = len(comp) ** 2
+        future = dp_score_difference(sim, memo, False)
+        value = gain - future
+
+        if value > best_value:
+            best_value = value
+            best_component = comp
+
+    return best_component, best_value
 
 # ==========================================================
 # ========== STRATEGY 3: BACKTRACKING + MEMOIZATION =======
@@ -636,5 +670,6 @@ def main_menu():
 # ==========================================================
 if __name__ == "__main__":
     main_menu()
+
 
 
