@@ -1,545 +1,516 @@
-==========================================================
-SAME GAME – ADT & DSA BASED IMPLEMENTATION
-Advanced Algorithmic Puzzle Game
-==========================================================
+===============================================================================
+                     SAME GAME – ADT & DSA BASED IMPLEMENTATION
+                         Advanced Algorithmic Puzzle Game
+===============================================================================
 
-Project Type : Data Structures & Algorithms Mini Project
-Language     : Python
-Interface    : GUI (Tkinter) + Console Version
-Paradigm     : Abstract Data Types + Algorithmic Design
+Project Type   : Data Structures & Algorithms Mini Project
+Language       : Python
+Interface      : GUI (Tkinter) + Console Version
+Paradigm       : Abstract Data Types + Algorithmic Design
 
-Team Members :
-Pravin R
-Vidhyadharan RP
-Srijith S
-Vijay Sathappan T
+Team Members   :
+    • Pravin R
+    • Vidhyadharan RP
+    • Srijith S
+    • Vijay Sathappan T
 
 
-==========================================================
+===============================================================================
 1. PROJECT DESCRIPTION
-==========================================================
+===============================================================================
 
-This project is an implementation of the classic puzzle
-game "Same Game" using Data Structures and Algorithms.
+This project is an implementation of the classic puzzle game "Same Game"
+developed using Data Structures and Algorithms.
 
-The goal of the game is to remove connected groups of
-same-colored blocks from a grid to maximize score.
+The objective of the game is to remove connected groups of same-colored
+blocks from a grid to maximize the score.
 
-The project demonstrates the practical use of several
-advanced algorithmic techniques including:
+This project demonstrates the application of several advanced algorithmic
+techniques such as:
 
-• Graph Traversal (DFS)
-• Greedy Algorithms
-• Divide & Conquer
-• Dynamic Programming
-• Backtracking with Memoization
-• Sorting Algorithms
-• Abstract Data Types
+    • Graph Traversal (DFS)
+    • Greedy Algorithms
+    • Divide & Conquer
+    • Dynamic Programming
+    • Backtracking with Memoization
+    • Sorting Algorithms
+    • Abstract Data Types (ADT)
 
-The system includes two versions:
+The system contains two implementations:
 
-1. GUI Version (Tkinter based)
-2. Console Based Version
+    1. GUI Version (Tkinter Interface)
+    2. Console-Based Version
 
-Both versions implement the same core algorithms but
-provide different interfaces.
+Both versions share the same core algorithms but provide different
+interaction styles.
 
 
-==========================================================
+===============================================================================
 2. GAME OBJECTIVE
-==========================================================
+===============================================================================
 
-The objective of Same Game is to maximize the score by
-removing connected groups of blocks.
+The goal of Same Game is to maximize the score by removing connected groups
+of blocks from the board.
 
-Rules:
+GAME RULES
 
-1. Blocks must be connected horizontally or vertically
-2. Minimum 2 blocks required for removal
-3. Score Formula:
+    1. Blocks must be connected vertically or horizontally.
+    2. Minimum 2 blocks are required to remove a group.
+    3. Score Formula:
 
-   Score = (Number of Blocks Removed)^2
+            Score = (Number of Blocks Removed)^2
 
-4. After removal:
-   - Blocks fall down due to gravity
-   - Empty columns shift left
+    4. After removal:
+            • Blocks fall downward due to gravity
+            • Empty columns shift to the left
 
-5. The game ends when no valid moves remain.
+    5. The game ends when no valid moves remain.
 
 
-==========================================================
+===============================================================================
 3. IMPLEMENTATION TYPES
-==========================================================
+===============================================================================
 
-----------------------------------
-A. GUI VERSION (Tkinter)
-----------------------------------
+A) GUI VERSION (Tkinter)
+-------------------------------------------------------------------------------
 
-The GUI version provides a visual interface with:
+The GUI version provides a professional interactive interface with:
 
-• Interactive board
-• Animated block removal
-• Real-time score updates
-• AI visualization system
-• Algorithm comparison tools
-• Adjustable board sizes
+    • Visual board display
+    • Animated block removal
+    • Real-time score updates
+    • AI visualization system
+    • Algorithm comparison tools
+    • Adjustable board sizes
 
 Game Modes:
 
-• Single Player
-• Human vs CPU
-• AI Analysis Mode
+    • Single Player Mode
+    • Human vs CPU Mode
+    • AI Analysis Mode
 
 Additional Features:
 
-• Live algorithm visualization
-• Step-by-step AI moves
-• Adjustable analysis speed
-• Algorithm benchmarking
+    • Real-time AI move visualization
+    • Algorithm benchmarking
+    • Adjustable AI speed
 
 
-----------------------------------
-B. CONSOLE VERSION
-----------------------------------
+B) CONSOLE VERSION
+-------------------------------------------------------------------------------
 
-The console version focuses on demonstrating the
-algorithmic strategies used in the game.
+The console version focuses on demonstrating algorithmic behavior.
 
-Features:
+Features include:
 
-• Menu-driven interface
-• Strategy selection
-• Optimal hint system
-• Benchmark testing
-• CPU strategy switching
+    • Menu-driven interface
+    • CPU strategy selection
+    • Optimal hint system
+    • Strategy benchmarking
+    • Multiplayer gameplay
 
 
-==========================================================
+===============================================================================
 4. ABSTRACT DATA TYPES USED
-==========================================================
+===============================================================================
 
-1. Grid ADT
------------
+1. GRID ADT
+-------------------------------------------------------------------------------
 
-Implementation: 2D List
+Implementation : 2D List
 
 Represents the game board.
 
 Example Board:
 
-R G B Y
-R R B Y
-G G Y Y
+        R  G  B  Y
+        R  R  B  Y
+        G  G  Y  Y
 
-Operations:
+Operations Supported:
 
-• Board creation
-• Board copying
-• Displaying board
-
-
-----------------------------------------------------------
-
-2. Graph ADT
-------------
-
-The grid is modeled as an implicit graph.
-
-Each cell represents a node.
-
-Edges exist between neighboring cells:
-
-Up
-Down
-Left
-Right
-
-Used for connected component detection.
+    • Board creation
+    • Board copying
+    • Board display
 
 
-----------------------------------------------------------
+2. GRAPH ADT
+-------------------------------------------------------------------------------
 
-3. Stack ADT
-------------
+The board is modeled as an implicit graph.
 
-Used in:
+Each cell is treated as a node.
 
-• Iterative DFS traversal
-• Gravity simulation
+Edges exist between adjacent cells:
 
-Stack temporarily stores blocks during gravity.
-
-
-----------------------------------------------------------
-
-4. Set ADT
-----------
-
-Used to track visited nodes during DFS traversal.
-
-
-----------------------------------------------------------
-
-5. List ADT
------------
+        Up
+        Down
+        Left
+        Right
 
 Used for:
 
-• Storing connected components
-• Storing possible moves
-• Tracking board states
+    • DFS traversal
+    • Connected component detection
 
 
-----------------------------------------------------------
+3. STACK ADT
+-------------------------------------------------------------------------------
 
-6. Dictionary ADT
------------------
+Used in:
+
+    • Iterative DFS traversal
+    • Gravity simulation
+
+The stack temporarily stores blocks during gravity processing.
+
+
+4. SET ADT
+-------------------------------------------------------------------------------
+
+Used to store visited nodes during DFS traversal to avoid repeated visits.
+
+
+5. LIST ADT
+-------------------------------------------------------------------------------
+
+Used for:
+
+    • Storing connected components
+    • Tracking possible moves
+    • Managing board states
+
+
+6. DICTIONARY ADT
+-------------------------------------------------------------------------------
 
 Used for memoization in:
 
-• Dynamic Programming
-• Backtracking algorithms
+    • Dynamic Programming
+    • Backtracking algorithms
 
 Stores previously evaluated board states.
 
 
-==========================================================
+===============================================================================
 5. ALGORITHMS IMPLEMENTED
-==========================================================
+===============================================================================
 
-The system implements three major AI strategies.
+Three major AI strategies are implemented.
 
 
-----------------------------------------------------------
 5.1 GREEDY ALGORITHM (Easy AI)
-----------------------------------------------------------
+-------------------------------------------------------------------------------
 
 Idea:
 
-Always remove the largest available block group.
+    Always remove the largest available block group.
 
 Steps:
 
-1. Find all connected components
-2. Compute score for each component
-3. Sort components using Merge Sort
-4. Select the largest component
+    1. Find all connected components using DFS
+    2. Calculate score of each component
+    3. Sort components using Merge Sort
+    4. Select the largest component
 
-Complexity:
+Time Complexity:
 
-DFS: O(N × M)
-Sorting: O(K log K)
+        DFS        : O(N × M)
+        Merge Sort : O(K log K)
 
 Advantages:
 
-• Very fast
-• Simple implementation
+    • Very fast
+    • Simple implementation
 
 Disadvantages:
 
-• Only locally optimal
-• May miss better long-term moves
+    • Only locally optimal
+    • May miss better long-term moves
 
 
-----------------------------------------------------------
 5.2 DIVIDE & CONQUER + DYNAMIC PROGRAMMING (Medium AI)
-----------------------------------------------------------
+-------------------------------------------------------------------------------
 
-This is the core algorithmic strategy used for the CPU.
+This is the main algorithm used by the CPU opponent.
 
-The algorithm operates in three phases.
+The process consists of three phases.
+
 
 PHASE 1 – DIVIDE
 
-The board is divided into independent column regions.
-Columns separated by empty columns form separate regions.
+    The board is divided into independent column regions.
+    Empty columns naturally separate independent sections.
+
 
 PHASE 2 – CONQUER
 
-Each region is evaluated using Dynamic Programming.
+    Each region is evaluated using Dynamic Programming.
 
-DP recursively evaluates future game states.
+    Recursive evaluation explores future game states.
 
-Score evaluation formula:
+    Score formula:
 
-score = gain − opponent_future_score
+        score = gain − opponent_future_score
 
-Memoization stores previously computed states.
+    Memoization avoids recomputation of board states.
+
 
 PHASE 3 – COMBINE
 
-Best moves from each region are compared to select the
-optimal move.
+    Best results from each region are compared to determine
+    the optimal move.
 
 Advantages:
 
-• Efficient state exploration
-• Reduces computational complexity
-• Produces near-optimal gameplay
+    • Efficient search space reduction
+    • Near-optimal decision making
 
 
-----------------------------------------------------------
 5.3 BACKTRACKING + MEMOIZATION (Hard AI)
-----------------------------------------------------------
+-------------------------------------------------------------------------------
 
 This strategy performs exhaustive search.
 
 Steps:
 
-1. Try every possible move
-2. Recursively explore future states
-3. Compute total achievable score
-4. Use memoization to avoid recomputation
+    1. Try every possible move
+    2. Recursively evaluate future states
+    3. Compute total achievable score
+    4. Cache board states using memoization
 
 Formula:
 
-Total Score = current_score + best_future_score
+        Total Score = Current Score + Best Future Score
 
 Advantages:
 
-• Finds globally optimal solution
+    • Finds globally optimal solution
 
 Disadvantages:
 
-• Computationally expensive
-• Slower on larger boards
+    • Computationally expensive
+    • Slower for large boards
 
 
-==========================================================
+===============================================================================
 6. GRAPH TRAVERSAL (DFS)
-==========================================================
+===============================================================================
 
-Depth First Search is used to detect connected
-components.
+Depth First Search is used to detect connected components.
 
-Process:
+Procedure:
 
-1. Start from selected cell
-2. Visit all same-colored neighbors
-3. Continue recursively until component is complete
+    1. Start from selected cell
+    2. Visit neighboring cells with same color
+    3. Continue until the entire component is found
 
 Time Complexity:
 
-O(N × M)
+        O(N × M)
 
 
-==========================================================
+===============================================================================
 7. GRAVITY ALGORITHM
-==========================================================
+===============================================================================
 
 After removing blocks, gravity is applied.
 
-Vertical Gravity
+
+VERTICAL GRAVITY
 
 Blocks fall downward to fill empty spaces.
 
-Horizontal Shift
 
-Empty columns shift to the left.
+HORIZONTAL SHIFT
+
+Entire columns shift left if they become empty.
 
 
-==========================================================
+===============================================================================
 8. AI ANALYSIS SYSTEM (GUI)
-==========================================================
+===============================================================================
 
-The GUI version includes a real-time AI visualization
-system.
+The GUI version includes a real-time AI visualization system.
 
 Features:
 
-• Live board visualization
-• Highlighted AI moves
-• Step-by-step algorithm execution
-• Adjustable speed control
+    • Live board updates
+    • Highlighted AI moves
+    • Step-by-step algorithm execution
+    • Adjustable analysis speed
 
-Displays:
+Displayed Information:
 
-• Move number
-• Score updates
-• Algorithm log
-• Execution time
+    • Move number
+    • Current score
+    • Algorithm logs
+    • Execution time
 
 
-==========================================================
+===============================================================================
 9. ALGORITHM COMPARISON SYSTEM
-==========================================================
+===============================================================================
 
-The program includes a benchmarking tool that compares
-all algorithms.
+A benchmarking system compares algorithm performance.
 
 Metrics measured:
 
-• Final Score
-• Number of Moves
-• Execution Time
+    • Final Score
+    • Number of Moves
+    • Execution Time
+
 
 Example Output:
 
-Strategy        Score    Moves    Time
-Greedy          450      12       0.03s
-DC + DP         520      11       0.45s
-Backtracking    540      10       2.12s
+    Strategy        Score     Moves     Time
+    ------------------------------------------------
+    Greedy          450       12        0.03s
+    DC + DP         520       11        0.45s
+    Backtracking    540       10        2.12s
 
 
-==========================================================
+===============================================================================
 10. GAME MODES
-==========================================================
+===============================================================================
 
-Single Player Mode
+SINGLE PLAYER MODE
 
-Player solves the board independently.
-
-Final score displayed when the game ends.
+    The player solves the board alone.
 
 
-----------------------------------------------------------
+MULTIPLAYER MODE (Human vs CPU)
 
-Multiplayer Mode (Human vs CPU)
-
-Player competes against CPU.
-
-CPU uses Divide & Conquer + Dynamic Programming.
-
-Winner determined by final score.
+    Player competes against the CPU.
+    CPU uses Divide & Conquer + Dynamic Programming.
 
 
-----------------------------------------------------------
+AI ANALYSIS MODE (GUI)
 
-AI Analysis Mode (GUI)
+    Allows visualization of algorithms solving the board.
 
-Allows visualization of algorithms solving the board.
-
-Algorithms available:
-
-Easy   : Greedy
-Medium : Divide & Conquer + DP
-Hard   : Backtracking + Memoization
+    Easy    : Greedy
+    Medium  : Divide & Conquer + DP
+    Hard    : Backtracking + Memoization
 
 
-==========================================================
+===============================================================================
 11. BOARD SIZE OPTIONS
-==========================================================
+===============================================================================
 
-Console Version
+Console Version:
 
-1. 5 x 5
-2. 10 x 5
-3. 15 x 10
-4. 20 x 5
-
-GUI Version
-
-1. 6 x 6
-2. 8 x 8
-3. 10 x 10
-
-Larger boards increase computational complexity.
+    1. 5 × 5
+    2. 10 × 5
+    3. 15 × 10
+    4. 20 × 5
 
 
-==========================================================
+GUI Version:
+
+    1. 6 × 6
+    2. 8 × 8
+    3. 10 × 10
+
+
+===============================================================================
 12. HOW TO RUN THE PROGRAM
-==========================================================
+===============================================================================
 
 Run GUI Version
 
-python same_game_gui.py
+        python same_game_gui.py
 
 Requirements:
 
-Python 3.x
-Tkinter
+        Python 3.x
+        Tkinter
 
-
-----------------------------------------------------------
 
 Run Console Version
 
-python same_game_console.py
-
-Follow the on-screen menu instructions.
+        python same_game_console.py
 
 
-==========================================================
+===============================================================================
 13. INPUT FORMAT
-==========================================================
+===============================================================================
 
-Row and column inputs are zero-indexed.
+Row and Column values are zero indexed.
 
 Example:
 
-Row: 2
-Column: 3
+        Row    : 2
+        Column : 3
 
 Invalid moves (single blocks) are rejected.
 
 
-==========================================================
+===============================================================================
 14. OUTPUT
-==========================================================
+===============================================================================
 
 The program displays:
 
-• Board state after each move
-• Player and CPU scores
-• CPU decision process
-• Algorithm execution logs
-• Final winner
+    • Board state after each move
+    • Player and CPU scores
+    • CPU decision process
+    • Algorithm logs
+    • Final winner
 
 
-==========================================================
+===============================================================================
 15. KEY FEATURES
-==========================================================
+===============================================================================
 
-✔ ADT-based design
-✔ Graph representation of board
-✔ DFS traversal for connected components
-✔ Stack-based gravity simulation
-✔ Greedy algorithm implementation
-✔ Divide & Conquer optimization
-✔ Dynamic Programming with memoization
-✔ Backtracking search strategy
-✔ AI visualization system
-✔ Algorithm benchmarking tools
-✔ Interactive GUI with animations
+    ✔ ADT-based system design
+    ✔ Graph representation of the board
+    ✔ DFS connected component detection
+    ✔ Stack-based gravity simulation
+    ✔ Greedy strategy implementation
+    ✔ Divide & Conquer optimization
+    ✔ Dynamic Programming with memoization
+    ✔ Backtracking search strategy
+    ✔ AI visualization system
+    ✔ Algorithm benchmarking tools
+    ✔ Interactive GUI gameplay
 
 
-==========================================================
+===============================================================================
 16. LEARNING OUTCOMES
-==========================================================
+===============================================================================
 
 This project demonstrates practical applications of:
 
-• Graph Theory
-• Depth First Search
-• Divide & Conquer algorithms
-• Dynamic Programming
-• Backtracking techniques
-• Memoization
-• Sorting algorithms
-• Algorithm performance analysis
+    • Graph Theory
+    • Depth First Search
+    • Divide & Conquer algorithms
+    • Dynamic Programming
+    • Backtracking techniques
+    • Memoization
+    • Sorting algorithms
+    • Algorithm performance analysis
 
 
-==========================================================
+===============================================================================
 17. CONCLUSION
-==========================================================
+===============================================================================
 
-The Same Game project demonstrates how a simple puzzle
-game can be transformed into a complex demonstration of
-advanced Data Structures and Algorithms.
+The Same Game project demonstrates how a simple puzzle game
+can be transformed into a complex demonstration of advanced
+Data Structures and Algorithms.
 
-By integrating multiple algorithmic strategies including
-Greedy, Divide & Conquer with Dynamic Programming, and
-Backtracking, the system allows comparison between
-different approaches to solving the same problem.
+By integrating Greedy, Divide & Conquer with Dynamic Programming,
+and Backtracking strategies, the system enables comparison
+between different algorithmic approaches.
 
-The inclusion of GUI visualization and benchmarking
-further highlights the behavior and performance of
-different algorithms.
+The addition of GUI visualization and benchmarking tools further
+enhances understanding of algorithm behavior and performance.
 
-This project successfully connects theoretical algorithm
-design with practical implementation.
+This project successfully connects theoretical algorithm design
+with real-world implementation.
 
 
-==========================================================
+===============================================================================
 END OF README
-==========================================================
+===============================================================================
