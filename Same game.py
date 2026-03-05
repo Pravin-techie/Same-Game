@@ -374,8 +374,44 @@ def combine_results(results):
 # ==========================================================
 
 # ==========================================================
+# BACKTRACKING SCORE
+# CSE24058 & 37 - [Vidhyadharan & Pravin]
+# ==========================================================
+backtrack_cache = {}
+
+def backtracking_score(grid):
+    """
+    Recursive backtracking to find maximum possible score
+    """
+    state = tuple(tuple(row) for row in grid.board)
+
+    if state in backtrack_cache:
+        return backtrack_cache[state]
+
+    components = get_all_components(grid)
+
+    if not components:
+        return 0
+
+    best = 0
+
+    for comp in components:
+        sim = copy_grid(grid)
+        remove_component(sim, comp)
+        apply_gravity(sim)
+
+        gain = len(comp) ** 2
+        future = backtracking_score(sim)
+        total = gain + future
+
+        best = max(best, total)
+
+    backtrack_cache[state] = best
+    return best
+
+# ==========================================================
 # BACKTRACKING BEST MOVE
-# CSE24059 - [Vijay Sathappan & Srijith]
+# CSE24059 & 44 - [Vijay Sathappan & Srijith]
 # ==========================================================
 def backtracking_best_move(grid):
     """
@@ -767,6 +803,7 @@ def main_menu():
 # ==========================================================
 if __name__ == "__main__":
     main_menu()
+
 
 
 
