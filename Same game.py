@@ -217,17 +217,8 @@ def greedy_best_move(grid):
     
     return best_component
 
-
-
 # ==========================================================
 # ====== STRATEGY 2: DIVIDE & CONQUER + DP ALGORITHM ======
-# ==========================================================
-# PASTE DC+DP FUNCTIONS HERE:
-# 1. dp_score_difference(grid, memo, is_cpu_turn)
-# 2. divide_board_regions(grid)
-# 3. conquer_region(grid, region_cols, memo)
-# 4. combine_results(results)
-# 5. cpu_best_move_dc_dp(grid)
 # ==========================================================
 
 # ==========================================================
@@ -413,10 +404,6 @@ def cpu_best_move_dc_dp(grid):
 
 # ==========================================================
 # ========== STRATEGY 3: BACKTRACKING + MEMOIZATION =======
-# ==========================================================
-# PASTE BACKTRACKING FUNCTIONS HERE:
-# 1. backtracking_score(grid)
-# 2. backtracking_best_move(grid)
 # ==========================================================
 
 # ==========================================================
@@ -849,6 +836,7 @@ def main_menu():
 # ==========================================================
 if __name__ == "__main__":
     main_menu()
+
 
 
 
